@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/xypisces.github.io/app-9489987f3183ed983b94.js","58a2037478aa9cfb285d008e1d51dff5"],["/xypisces.github.io/commons-af3fe49751ef4744cf5e.js","068130587a80e90b3ed1064a08d7473a"],["/xypisces.github.io/index.html","5a9f48648d9cf7f437c32395e684346a"],["/xypisces.github.io/manifest.json","2994c712109fe06c2845bb6401ffa10d"],["/xypisces.github.io/offline-plugin-app-shell-fallback/index.html","d4725fd698064a16b72ee2cd3beea1f1"]];
+var precacheConfig = [["/xypisces.github.io/app-9489987f3183ed983b94.js","58a2037478aa9cfb285d008e1d51dff5"],["/xypisces.github.io/commons-af3fe49751ef4744cf5e.js","068130587a80e90b3ed1064a08d7473a"],["/xypisces.github.io/index.html","701a89d4b57fee506b95571ffaf18b4e"],["/xypisces.github.io/manifest.json","2994c712109fe06c2845bb6401ffa10d"],["/xypisces.github.io/offline-plugin-app-shell-fallback/index.html","502ccb23525a27f54262773e9f072453"]];
 var cacheName = 'sw-precache-v3-gatsby-plugin-offline-' + (self.registration ? self.registration.scope : '');
 
 
