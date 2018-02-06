@@ -29,12 +29,16 @@
       "component---src-layouts-index-js-6a6b507f0ef074170d21.js.map"
     ],
     "path---index": [
-      "path---index-89fd7e298effb5dd7568.js",
-      "path---index-89fd7e298effb5dd7568.js.map"
+      "path---index-187097adc239608f0e41.js",
+      "path---index-187097adc239608f0e41.js.map"
     ],
     "commons": [
       "commons-af3fe49751ef4744cf5e.js",
       "commons-af3fe49751ef4744cf5e.js.map"
+    ],
+    "path---gatsby": [
+      "path---gatsby-deb9364b9c5979194aac.js",
+      "path---gatsby-deb9364b9c5979194aac.js.map"
     ],
     "path---express-api": [
       "path---express-api-d3b3adf08b9ea19f832a.js",
@@ -57,9 +61,9 @@
       "path---know-js-2-a5301086271ff1182b26.js.map"
     ],
     "app": [
-      "app-faa60fbcfc3e476f252e.js",
+      "app-8d738e22d3e2508f837c.js",
       "build-js-styles.css",
-      "app-faa60fbcfc3e476f252e.js.map",
+      "app-8d738e22d3e2508f837c.js.map",
       "build-js-styles.css.map"
     ]
   }
