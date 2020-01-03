@@ -133,6 +133,10 @@ article .article-title,
 h2 {
   font-size: 2rem;
 }
+article .article-title,
+h2 a {
+  color: #009688;
+}
 nav ul.inline li a {
   display: block;
 }
