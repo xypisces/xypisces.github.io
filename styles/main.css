@@ -133,9 +133,32 @@ article .article-title,
 h2 {
   font-size: 2rem;
 }
-article .article-title,
-h2 a {
+a {
   color: #009688;
+  background-image: none;
+  border-bottom: 3px solid #009688;
+  border-bottom-left-radius: 30px 3px;
+  border-bottom-right-radius: 15px 5px;
+}
+nav a {
+  border-bottom: 5px solid #009688;
+}
+a:visited {
+  color: #009688;
+}
+a:hover {
+  color: #50b3a9;
+}
+button,
+.paper-btn {
+  border: 2px solid #009688;
+  color: #009688;
+}
+.row.tags-container a {
+  color: #fff;
+}
+p.article-meta a:hover {
+  color: #fff;
 }
 nav ul.inline li a {
   display: block;
