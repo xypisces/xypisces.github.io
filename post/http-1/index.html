@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>前端性能优化原理与实践 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>前端性能优化原理与实践</h1>
+            <p class="article-meta">
+              2018-04-16
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge ">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>url从输入到页面到底发生了什么，这几乎是面试必考题，当你回答出来了，然后面试官问你怎么针对性优化，你还能答得上来么？</p>
+<!-- more -->
+<h3 id="url-页面的生成过程">url-&gt;页面的生成过程</h3>
+<ul>
+<li>DNS查询,返回IP地址</li>
+<li>TCP三次握手，应用层将数据传到传输层，TCP指明端口号，下发到网络层的IP协议确定IP地址，下发到数据链路层封装数据帧，最后是物理层面的传输</li>
+<li>如果有HTTPS则还会进行TLS握手，然后进行真正的传输</li>
+<li>如果有负载均衡的服务器，则将请求分发到多个服务器，</li>
+<li>假设服务器响应一个文件，浏览器会先判断状态码，200则进行解析，300则进行重定向，400或500则报错</li>
+<li>如果是gizp等格式则会解压一下，然后通过文件编码去解析</li>
+<li>HTML文件则会构建DOM树，CSS树，遇到JS文件会先判断async还是defer进行下载，如果什么都没有则会阻塞渲染直到JS执行</li>
+<li>HTML完全加载解析后触发DOMContentLoaded树</li>
+<li>CSS树和DOM树构建完成生成render树</li>
+<li>最后调用GPU绘制，合成图层，显示到屏幕中</li>
+</ul>
+<h3 id="图片层面的优化">图片层面的优化</h3>
+<p>针对不同场景的图片，使用不同的格式能对网站可以有很大的提升，下面的总结的是各个格式的适用场景</p>
+<ul>
+<li>JPEG/JPG: 有损压缩，适用于大图，色彩丰富的图片</li>
+<li>PNG: 无损压缩，支持透明，适用于小图Logo等</li>
+<li>SVG: 文本文件，体积小，兼容性好，适用于简单图形icon等</li>
+<li>Base64: 文本文件，与svg一样，小于2kb的图片可以使用base64，减少请求</li>
+<li>WebP: 全能型，但是兼容性不好</li>
+</ul>
+<h3 id="http缓存机制">HTTP缓存机制</h3>
+<p>HTTP 缓存是我们日常开发中最为熟悉的一种缓存机制。它又分为强缓存和协商缓存。优先级较高的是强缓存，在命中强缓存失败的情况下，才会走协商缓存。</p>
+<h4 id="强缓存">强缓存</h4>
+<ul>
+<li>expires</li>
+</ul>
+<p><code>expires: Wed, 11 Sep 2019 16:12:18 GMT</code></p>
+<p>expires是一个时间戳，当本地时间小于expries设置的时间，则会去缓存中取，缺点就是如果直接修改本地时间，则expries就会达不到想要预期，因此诞生了cache-control</p>
+<ul>
+<li>cache-control</li>
+</ul>
+<p><code>cache-control: max-age=31536000</code></p>
+<p>cache-control优先级比较高，max-age是一个时间长度，在这里时间长度以内的请求的资源都从缓存中取</p>
+<h4 id="协商缓存">协商缓存</h4>
+<ul>
+<li>Last-Modified</li>
+</ul>
+<p>首次请求后会返回<code>Last-Modified: Fri, 27 Oct 2017 06:35:57 GMT</code> ，随后发起请求后回带上<code>If-Modified-Since: Fri, 27 Oct 2017 06:35:57 GMT</code>，当服务端判断该时间戳和资源在服务器最后修改的时间是否一致，从而判断是否发生变化。</p>
+<p>存在的缺点就是1.编辑了文件，但是内容没变，服务端无法识别，只通过时间修改判断，从而会被重新请求。2.修改过快也会导致服务端感知不到（识别秒级以上的差异）</p>
+<ul>
+<li>Etag</li>
+</ul>
+<p>首次请求后会返回<code>ETag: W/&quot;2a3b-1602480f459&quot;</code> ，随后发起请求后回带上<code>If-None-Match: W/&quot;2a3b-1602480f459&quot;</code>，Etag 的生成过程需要服务器额外付出开销，会影响服务端的性能，这是它的弊端。因此启用 Etag 需要我们审时度势。</p>
+<h3 id="选择合适的缓存策略">选择合适的缓存策略</h3>
+<ul>
+<li>对于某些不需要缓存的资源，可以使用 <code>Cache-control: no-store</code>，表示该资源不需要缓存</li>
+<li>对于频繁变动的资源，可以使用 <code>Cache-Control: no-cache</code> 并配合 <code>ETag</code> 使用，表示该资源已被缓存，但是每次都会发送请求询问资源是否更新。</li>
+<li>对于代码文件来说，通常使用 <code>Cache-Control: max-age=31536000</code> 并配合策略缓存使用，然后对文件进行指纹处理，一旦文件名变动就会立刻下载新的文件。</li>
+</ul>
+<h3 id="浏览器渲染过程">浏览器渲染过程</h3>
+<p>解析HTML-&gt;计算样式-&gt;计算图层布局-&gt;绘制图层-&gt;GUP渲染得到页面</p>
+<p>优化点：</p>
+<ul>
+<li>由于css选择器是从右往左边开始匹配，因此要避免过深的嵌套，少用标签选择器，会全局搜索匹配，浪费性能，多用类选择器</li>
+<li>HTML，CSS，JS都会堵塞，从上至下的进行渲染，因此css尽量放到头部，js放到尾部</li>
+<li>js有三种加载方式:正常加载，defer加载(异步加载，等文档解析完全后再执行。当脚本依赖于 DOM 元素和其它脚本的执行结果时，我们会选用 defer)， async加载(异步加载，加载结束就执行，一般当我们的脚本与 DOM 元素和其它脚本之间的依赖关系不强时，我们会选用 async)</li>
+</ul>
+<h3 id="重绘与回流">重绘与回流</h3>
+<ul>
+<li>重绘：当节点需要更改外观而不会影响布局的，如改变颜色</li>
+<li>回流：布局或者几何属性需要改变就称为回流，如改变大小</li>
+</ul>
+<p>重绘不一定会引发回流，但是回流一定会引发重绘。下面几个操作就会导致回流和重绘</p>
+<ul>
+<li>改变window大小</li>
+<li>改变字体大小</li>
+<li>添加或删除样式</li>
+<li>文字改变</li>
+<li>定位或者浮动</li>
+<li>盒模型修改</li>
+</ul>
+<blockquote>
+<p>浏览器一帧中发生了什么？<br>
+1.Event loop执行完Microtasks会判断document是否需要更新<br>
+2.判断resize或者scroll时间<br>
+3.判断是否触发了media query<br>
+4.更新动画并且发送事件<br>
+5.判断是否有全屏操作<br>
+6.执行 requestAnimationFrame 回调<br>
+7.执行 intersectionObserver回调判断元素是否可见<br>
+8.更新界面</p>
+</blockquote>
+<h3 id="面试题">面试题</h3>
+<p>如何渲染几万条数据并不卡住界面</p>
+<pre><code class="language-js">setTimeout(()=&gt;{
+  const total = 100000
+  const once = 20
+  const loopCount = total / once
+  let countOfRender = 0
+  let ul = document.querySelector('ul')
+  function add(){
+    const fragment = document.createDocumentFragment()
+    for(let i=0; i&lt;once; i++){
+      const li = document.createElement('li')
+      li.innerText = Marh.floor(Math.random() * total)
+      fragment.appendChild(li)
+    }
+    ul.appendChild(fragment)
+    countOfRender += 1
+    loop()
+  }
+  function loop(){
+    if(countOfRender &lt; loopCount) {
+      window.requestAnimationFrame(add)
+    }
+  }
+},0)
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/leetcode-math">
+                <h3 class="post-title">
+                  leetcode初级算法-数学篇和排序搜索篇JavaScript实现
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge secondary">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

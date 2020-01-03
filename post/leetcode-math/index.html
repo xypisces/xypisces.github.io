@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>leetcode初级算法-数学篇和排序搜索篇JavaScript实现 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>leetcode初级算法-数学篇和排序搜索篇JavaScript实现</h1>
+            <p class="article-meta">
+              2018-02-21
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge ">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>考察基本的数学思维和基本的排序算法</p>
+<!-- more -->
+<h3 id="合并两个有序数组">合并两个有序数组</h3>
+<p>给定两个有序整数数组 nums1 和 nums2，将 nums2 合并到 nums1 中，使得 num1 成为一个有序数组。</p>
+<pre><code>输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+输出: [1,2,2,3,5,6]
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    for(let i = 0; i&lt;n; i++) {
+        nums1[m+i] = nums2[i]
+    }
+    nums1.sort(function(a,b){
+        return a-b
+    })
+};
+</code></pre>
+<h3 id="第一个错误的版本">第一个错误的版本</h3>
+<p>你是产品经理，目前正在带领一个团队开发新的产品。不幸的是，你的产品的最新版本没有通过质量检测。由于每个版本都是基于之前的版本开发的，所以错误的版本之后的所有版本都是错的。</p>
+<p>假设你有 n 个版本 [1, 2, ..., n]，你想找出导致之后所有版本出错的第一个错误的版本。</p>
+<p>你可以通过调用 bool isBadVersion(version) 接口来判断版本号 version 是否在单元测试中出错。实现一个函数来查找第一个错误的版本。你应该尽量减少对调用 API 的次数</p>
+<pre><code>给定 n = 5，并且 version = 4 是第一个错误的版本。
+
+调用 isBadVersion(3) -&gt; false
+调用 isBadVersion(5) -&gt; true
+调用 isBadVersion(4) -&gt; true
+
+所以，4 是第一个错误的版本。
+</code></pre>
+<p>分析： 就是二分查找法，维护两个指针，依次二分，找到最终的点</p>
+<pre><code class="language-js">/**
+ * Definition for isBadVersion()
+ * 
+ * @param {integer} version number
+ * @return {boolean} whether the version is bad
+ * isBadVersion = function(version) {
+ *     ...
+ * };
+ */
+
+/**
+ * @param {function} isBadVersion()
+ * @return {function}
+ */
+var solution = function(isBadVersion) {
+    /**
+     * @param {integer} n Total versions
+     * @return {integer} The first bad version
+     */
+    return function(n) {
+        if(n &lt;= 0) return 0
+        let l = 1, r=n
+        while(l&lt;r){
+          let mid = Math.floor((l+r)/2)
+          if(isBadVersion(mid)){
+            r = mid
+          }else{
+            l = mid + 1
+          }
+        }
+        return l
+    };
+};
+</code></pre>
+<h3 id="3的幂">3的幂</h3>
+<p>给定一个整数，写一个函数来判断它是否是 3 的幂次方。你能不使用循环或者递归来完成本题吗？</p>
+<pre><code>输入: 9
+输出: true
+输入: 45
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isPowerOfThree = function(n) {
+    let s = n
+    while(1){
+        if(s === 1){
+            return true
+        }else if(s &lt; 1) {
+            return false
+        }
+        s = s/3
+    }
+    //不使用递归
+    let s = Math.log10(n)/Math.log10(3)
+    return s-Math.floor(s) === 0
+};
+</code></pre>
+<h3 id="计数质数">计数质数</h3>
+<p>统计所有小于非负整数 n 的质数的数量。</p>
+<pre><code>输入: 10
+输出: 4
+解释: 小于 10 的质数一共有 4 个, 它们是 2, 3, 5, 7 。
+</code></pre>
+<p>分析：</p>
+<ul>
+<li>质数只能被1和他本身整除</li>
+<li>例子：如16= 1<em>16，2</em>8，4<em>4，8</em>2，16<em>1，如25= 1</em>25，5<em>5，25</em>1</li>
+<li>由上面例子可以知道，i*j=n的过程中，存在一个开平方k，只需判断k之前是否有其他整除树即可，从而减少循环的次数</li>
+<li>首先排除除2之外的偶数，然后遍历k之前树，如果有整除则跳过，没有则count加一</li>
+</ul>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let count = 0
+    for(let i = 2; i&lt;n; i++){
+      if(i == 2) count++;
+      if(i % 2 == 0) continue
+      let isPrime = true
+      for(let j=3; j&lt;=Math.sqrt(i); j+=2) {
+        if(i % j === 0) {
+          isPrime = false;
+          break
+        }
+      }
+      if(isPrime) {
+        count++
+      }
+    }
+    return count
+};
+</code></pre>
+<h3 id="fizz-buzz">Fizz Buzz</h3>
+<p>写一个程序，输出从 1 到 n 数字的字符串表示。</p>
+<ol>
+<li>
+<p>如果 n 是3的倍数，输出“Fizz”；</p>
+</li>
+<li>
+<p>如果 n 是5的倍数，输出“Buzz”；</p>
+</li>
+<li>
+<p>如果 n 同时是3和5的倍数，输出 “FizzBuzz”。</p>
+</li>
+</ol>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    let arr = []
+    for(let i=1; i&lt;=n; i++){
+      if(i%3===0 &amp;&amp; i%5 === 0){
+        arr.push('FizzBuzz')
+      }else if(i % 3 === 0) {
+        arr.push('Fizz')
+      }else if(i % 5 === 0) {
+        arr.push('Buzz')
+      }else{
+        arr.push(i+'')
+      }
+    }
+    return arr
+};
+</code></pre>
+<h3 id="罗马数字转整数">罗马数字转整数</h3>
+<pre><code>字符          数值
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+</code></pre>
+<p>例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。</p>
+<p>通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：</p>
+<p>I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。<br>
+X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。<br>
+C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。<br>
+给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。</p>
+<pre><code>输入: &quot;III&quot;
+输出: 3
+输入: &quot;LVIII&quot;
+输出: 58
+解释: L = 50, V= 5, III = 3.
+输入: &quot;MCMXCIV&quot;
+输出: 1994
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+</code></pre>
+<p>解法1:</p>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+  //暴力解法1
+  let count = 0;
+  let i = 0
+  while(i&lt;s.length){
+    switch(s.charAt(i)){
+      case 'M':
+        count+=1000
+        i++;
+        break;
+      case 'D':
+        count+=500
+        i++;
+        break;
+      case 'C':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1) === 'D'){
+          count+=400
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1) === 'M'){
+          count+=900
+          i+=2
+        }else{
+          count+=100
+          i+=1
+        }
+        break;
+      case 'L':
+        count+=50;
+        i++;
+        break;
+      case 'X':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'L'){
+          count+=40
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'C'){
+          count+=90
+          i+=2
+        }else{
+          count+=10
+          i+=1
+        }
+        break;
+      case 'V':
+        count+=5;
+        i++;
+        break;
+      case 'I':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'V'){
+          count+=4
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'X'){
+          count+=9
+          i+=2
+        }else{
+          count+=1
+          i+=1
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return count
+};
+</code></pre>
+<p>解法2:</p>
+<pre><code class="language-js">//数组索引法
+  let roman = ['I','V','X','L','C','D','M','IV','IX','XL','XC','CD','CM']
+  let num = [1,5,10,50,100,500,1000,4,9,40,90,400,900]
+  let count = 0
+  let i = 0
+  while(i&lt;s.length){
+    let index = roman.indexOf(s.charAt(i))
+    let index2 = roman.indexOf(s.charAt(i)+s.charAt(i+1))
+    if(index2 !== -1) {
+      count += num[index2]
+      i+=2
+    }else{
+      count += num[index]
+      i+=1
+    }
+  }
+  return count
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/leetcode-string">
+                <h3 class="post-title">
+                  leetcode初级算法-字符串篇JavaScript实现
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge secondary">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

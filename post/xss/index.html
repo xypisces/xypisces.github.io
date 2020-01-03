@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>必知必会--浏览器安全知识 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>必知必会--浏览器安全知识</h1>
+            <p class="article-meta">
+              2018-07-14
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>前端涉及到的安全问题主要有二大块，xss攻击和csrf攻击，虽然前端发展至今已经有很多抵御这两种攻击的方式了，但也不是不能不了解的知识点</p>
+<!-- more -->
+<h3 id="xss">XSS</h3>
+<p>xss主要有三种：反射型，存储型，DOM-based</p>
+<h4 id="攻击过程">攻击过程</h4>
+<p>通过修改HTML节点或者执行JS代码来攻击网站</p>
+<p>例如： <code>&lt;div&gt;{{name}}&lt;/div&gt;</code>, 如果name的值是一段js代码，那么在页面上就会被执行</p>
+<p>变成<code>&lt;div&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;&lt;/div&gt;</code>,比如提交表单的时候进行执行，这种就叫做存储性攻击，因为每个看到这个表单内容都会触发这个攻击，可以用来获取网站用户cookies保存到自己的服务器当中</p>
+<p>又或者在URl节点中嵌入JS代码</p>
+<pre><code class="language-html">http://www.domain.com?name=&lt;script&gt;alert(1)&lt;/script&gt;
+&lt;div&gt;{{name}}&lt;/div&gt;    
+</code></pre>
+<p>输入上面URL的时候，页面就多一段可执行的js脚本，这中叫做反射型攻击</p>
+<h4 id="如何防御">如何防御</h4>
+<ul>
+<li>对输入输出的代码进行转义处理</li>
+<li>针对富文本可以采用添加白名单进行过滤处理，避免有危险的标签</li>
+<li>CSP，在http头部添加content-security-policy进行控制（本质也是黑白名单控制）</li>
+</ul>
+<h3 id="csrf">CSRF</h3>
+<p>利用用户的登陆状态发起恶意请求</p>
+<h4 id="如何攻击">如何攻击</h4>
+<p>假设网站中有一个通过 Get 请求提交用户评论的接口，那么攻击者就可以在钓鱼网站中加入一个图片，图片的地址就是评论接口</p>
+<pre><code class="language-html">&lt;img src=&quot;http://www.domain.com/xxx?comment='attack'&quot;/&gt;
+</code></pre>
+<p>如果接口是 Post 提交的，需要用表单来提交接口</p>
+<pre><code class="language-html">&lt;form action=&quot;http://www.domain.com/xxx&quot; id=&quot;CSRF&quot; method=&quot;post&quot;&gt;
+    &lt;input name=&quot;comment&quot; value=&quot;attack&quot; type=&quot;hidden&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<h4 id="如何防御-2">如何防御</h4>
+<ul>
+<li>get请求无法修改数据</li>
+<li>不让第三方网站访问到cookie，比如sameSite（cookie不会跨域请求携带）</li>
+<li>阻止第三方网站请求接口， 比如 referer （验证请求来源）</li>
+<li>请求时附带信息，比如token（服务器下发，每次请求时携带进行验证）</li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/useful-fn">
+                <h3 class="post-title">
+                  JavaScript中常用的方法的相关实现
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge ">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge secondary">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

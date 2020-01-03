@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>常用的Web-API的相关知识 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>常用的Web-API的相关知识</h1>
+            <p class="article-meta">
+              2018-01-30
+              
+                <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge success">
+                  JavaScript
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>浏览器自带的api运用得当，可以事半功倍哦！</p>
+<!-- more -->
+<ul>
+<li>BOM</li>
+<li>DOM</li>
+<li>事件绑定</li>
+<li>ajax</li>
+<li>存储</li>
+</ul>
+<h3 id="常用的bom操作相关浏览器对象模型">常用的BOM操作相关（浏览器对象模型）</h3>
+<ul>
+<li>navigator 获取浏览器信息</li>
+</ul>
+<pre><code class="language-js">const ua = navigator.userAgent
+const isChrome = ua.indexOf('chrome')
+</code></pre>
+<ul>
+<li>screen 获取屏幕宽高</li>
+</ul>
+<pre><code class="language-js">screen.width
+screen.height
+</code></pre>
+<ul>
+<li>location 网络地址相关</li>
+</ul>
+<pre><code class="language-js">localtion.href //地址  www.baidu.com/api?a=1#hhh
+    .protocol //协议  https
+    .pathname //path /api
+    .search //参数 ?a=1
+    .hash //hash #hhh
+</code></pre>
+<ul>
+<li>history</li>
+</ul>
+<pre><code class="language-js">history.back()
+    .go()
+    .forward()
+</code></pre>
+<ul>
+<li>scroll</li>
+</ul>
+<pre><code class="language-js">scrollTo({}) //相对于页面的顶部滚动
+scrollBy({  //相对于浏览器的顶部滚动，适用于连续滚动
+    top: 100,
+    left: 100,
+    behavior: 'smooth'
+})
+</code></pre>
+<h3 id="常用的dom操作">常用的DOM操作</h3>
+<ul>
+<li>DOM 就是 JS 能识别的 HTML 结构，一个普通的 JS 对象或者数组。</li>
+</ul>
+<h4 id="property和attribute的区别">property和attribute的区别</h4>
+<ul>
+<li>property的获取和修改是直接改变dom对应的js对象</li>
+<li>attribute的获取和修改则是直接修改html上的属性，会触发dom的查询，重绘，重排，影响页面的性能</li>
+</ul>
+<pre><code class="language-js">const pdom = document.querySelectAll('p')
+const p = pdom[0]
+//property获取和修改
+p.style.width
+p.className = 'p1'
+//attribute获取和修改
+p.getAttribute('data-name')
+p.setAttribute('data-name','juejin')
+</code></pre>
+<h4 id="dom树常用的操作">dom树常用的操作</h4>
+<pre><code class="language-js">const div = document.getElementById('div1')
+// 新增节点
+const p1 = document.createElement('p')
+p1.innerHtml = 'this is p'
+div.appendChild(p1)
+// 获取父元素
+const parent = div.parentElement
+//获取子元素
+const child = div.childNodes
+//删除节点
+div.removeChild(child[0])
+</code></pre>
+<h3 id="事件绑定相关">事件绑定相关</h3>
+<h4 id="简单的事件绑定封装">简单的事件绑定封装</h4>
+<pre><code class="language-js"> function bindEvent(id,type,fn){
+    const a = document.getElementById(id)
+    if(a){
+        a.addEventListener(type,fn)
+    }
+ }
+ bindEvent('div','click',(e)=&gt;{
+    e.preventDefault()
+    console.log('hello')
+ })
+</code></pre>
+<h4 id="事件冒泡与事件代理">事件冒泡与事件代理</h4>
+<ul>
+<li>事件冒泡即当父子元素都绑定相同类型的事件，触发子元素时，会从下到上依次寻找是否有被相同绑定的元素，依次触发，直到结束。</li>
+</ul>
+<pre><code class="language-js">var body = document.body
+bindEvent(body, 'click', function (e) {
+    // 所有 p 的点击都会冒泡到 body 上，因为 DOM 结构中 body 是 p 的上级节点，事件会沿着 DOM 树向上冒泡
+    alert('取消')
+})
+
+var p1 = document.getElementById('p1')
+bindEvent(p1, 'click', function (e) {
+    e.stopPropagation() // 阻止冒泡
+    alert('激活')
+})
+</code></pre>
+<ul>
+<li>事件代理也叫事件委托，当需要同时监听同级的相同元素时，可以将事件绑定其父元素上</li>
+</ul>
+<pre><code class="language-js">var div1 = document.getElementById('div1')
+div1.addEventListener('click', function (e) {
+  // e.target 可以监听到触发点击事件的元素是哪一个
+  var target = e.target
+  if (target.nodeName === 'A') {
+      // 点击的是 &lt;a&gt; 元素
+      alert(target.innerHTML)
+  }
+})
+</code></pre>
+<ul>
+<li>当元素同时有事件绑定和事件委托的时候，先触发绑定的元素，再触发委托的事件,因为dom2级，默认的是事件冒泡的结构，需要改成捕获的话需要在addEventElement的第三个参数改成true</li>
+</ul>
+<pre><code class="language-js">//优化刚开始的绑定函数
+function bindEvent(elem, type, selector, fn) {
+    // 这样处理，可接收两种调用方式 bindEvent(div1, 'click', 'a', function () {...}) 和 bindEvent(div1, 'click', function () {...}) 这两种
+    if (fn == null) {
+        fn = selector
+        selector = null
+    }
+    // 绑定事件
+    elem.addEventListener(type, function (e) {
+        var target
+        if (selector) {
+            // 有 selector 说明需要做事件代理
+            // 获取触发时间的元素，即 e.target
+            target = e.target
+            // 看是否符合 selector 这个条件
+            if (target.matches(selector)) {
+                fn.call(target, e)
+            }
+        } else {
+            // 无 selector ，说明不需要事件代理
+            fn(e)
+        }
+    })
+}
+</code></pre>
+<h3 id="ajax">Ajax</h3>
+<ul>
+<li>XMLHttpRequest</li>
+</ul>
+<pre><code class="language-js">//纯ajax
+var xhr = new XMLHttpRequest()
+xhr.onreadystatechange = function(){
+    if(xhr.readystate === 4){
+        if(xhr.status === 200){
+         ....
+        }
+    }
+}
+xhr.open('GET','/api',false) //readystate等于1调用
+xhr.send(null) //等于2调用
+</code></pre>
+<ul>
+<li>fetch</li>
+</ul>
+<pre><code class="language-js">fetch('some/api/data.json', {
+  method:'POST', //请求类型 GET、POST
+  headers:{}, // 请求的头信息，形式为 Headers 对象或 ByteString
+  body:{}, //请求发送的数据 blob、BufferSource、FormData、URLSearchParams（get 或head 方法中不能包含 body）
+  mode:'', //请求的模式，是否跨域等，如 cors、 no-cors 或 same-origin
+  credentials:'', //cookie 的跨域策略，如 omit、same-origin 或 include
+  cache:'', //请求的 cache 模式: default、no-store、reload、no-cache、 force-cache 或 only-if-cached
+}).then(function(response) { ... });
+</code></pre>
+<h4 id="跨域问题">跨域问题</h4>
+<ul>
+<li>当协议，域名，端口其中之一不同时，即为跨域</li>
+<li>但是script,img,link标签的src可以跨域</li>
+<li>JSONP解决跨域，即本地创建好一个函数，然后引入跨域服务器的js脚本，js脚本中执行函数，从而将数据传回本地当中去</li>
+</ul>
+<pre><code class="language-js">&lt;script type=&quot;text/javascript&quot;&gt; 
+    // 得到航班信息查询结果后的回调函数 
+    var flightHandler = function(data){
+        alert('你查询的航班结果是：票价 ' + data.price + ' 元，' + '余票 ' + data.tickets + ' 张。');
+    }; 
+    // 提供jsonp服务的url地址（不管是什么类型的地址，最终生成的返回值都是一段javascript代码） 
+    var url = &quot;跨域服务器/flightResult.php?code=CA1998&amp;callback=flightHandler&quot;;
+    // 创建script标签，设置其属性 
+    var script = document.createElement('script'); 
+    script.setAttribute('src', url); 
+    // 把script标签加入head，此时调用开始 
+    document.getElementsByTagName('head')[0].appendChild(script); 
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>服务器端设置 http header解决跨域</li>
+</ul>
+<pre><code class="language-js">response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);  // 第二个参数填写允许跨域的域名称，不建议直接写 &quot;*&quot;
+response.setHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;X-Requested-With&quot;);
+response.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;PUT,POST,GET,DELETE,OPTIONS&quot;);
+
+// 接收跨域的cookie
+response.setHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;);
+</code></pre>
+<h3 id="存储相关">存储相关</h3>
+<h4 id="cookie">cookie</h4>
+<ul>
+<li>存储小，只有4kb</li>
+<li>所有http请求都会带着，影响效率</li>
+<li>api简单，需要封装</li>
+</ul>
+<h4 id="localstorage和sessionstorage">localStorage和sessionStorage</h4>
+<ul>
+<li>存储大，有5mb</li>
+<li>不会带到http中</li>
+<li>api简单，localStorage.setItem(key,value),getItem(key)</li>
+<li>sessionStorage是当浏览器退出即删除，localStorage则是一直存在</li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/html-css">
+                <h3 class="post-title">
+                  常见的HTML-CSS中会遇到的问题
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge secondary">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge ">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

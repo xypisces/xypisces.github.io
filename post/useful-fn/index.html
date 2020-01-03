@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>JavaScript中常用的方法的相关实现 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>JavaScript中常用的方法的相关实现</h1>
+            <p class="article-meta">
+              2018-05-16
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>本文涉及日常开发常用的方法的相关实现，在面试中也是经常能够被问到的</p>
+<!-- more -->
+<ul>
+<li>new</li>
+<li>object.create</li>
+<li>instanceof</li>
+<li>bind</li>
+<li>深克隆</li>
+<li>debounce</li>
+<li>throttle</li>
+</ul>
+<h3 id="new">new</h3>
+<p>new 的实质过程：</p>
+<ul>
+<li>生成一个新的空对象</li>
+<li>链接到原型</li>
+<li>绑定 this</li>
+<li>返回新对象</li>
+</ul>
+<pre><code class="language-js">function new(){
+    let obj = {}
+    let Con = [].prototype.shift.call(arguments)
+    obj.__proto__ = Con.prototype
+    let result = Con.apply(obj,arguments)
+    return typeof result === 'object' ? result : obj
+}
+</code></pre>
+<h3 id="objectcreate">Object.create</h3>
+<p>object.create 的实质就是构建一个空的构造函数，将其原型指向参数对象，然后返回 F 的示例，从而实现继承的效果</p>
+<pre><code class="language-js">Object.create = function(obj) {
+  function F() {} // var B = {}
+  F.prototype = obj; // Object.setPrototypeOf(B,obj)  // B.__proto__ = obj
+  return new F(); // return B
+};
+</code></pre>
+<blockquote>
+<p>知识点，Object.creat 和 new 都可以创建对象，由上面可以看出区别在于 Object.create 创建的对象是基于传入的对象作为原型，其本身为一个空对象</p>
+</blockquote>
+<pre><code class="language-js">function Super() {
+  this.a = 2;
+}
+Super.prototype.getName = function() {
+  return 1;
+};
+const b = new Super();
+console.log(b); // { a: 2 }
+const c = Object.create(b);
+console.log(c); // {}
+</code></pre>
+<h3 id="instanceof">instanceof</h3>
+<p>instanceof 实质则是判断对象的原型链是不是能找到类型的 prototype</p>
+<pre><code class="language-js">function instanceof(left,right){
+    let prototype = right.prototype
+    left = left.__proto__
+    while(true){
+        if(left === null){return false}
+        if(prototype === left){return true}
+        left = left.__proto__
+    }
+}
+</code></pre>
+<h3 id="bind">bind</h3>
+<p>bind 实质是 call(this,'a','b')和 apply(this,['a','b'])的升级版，call 和 apply 直接执行，bind 则是返回一个函数</p>
+<pre><code class="language-js">//改变了 this 指向，让新的对象可以执行该函数。那么思路是否可以变成给新的对象添加一个函数，然后在执行完以后删除？
+//apply
+Function.prototype.apply = function(context){
+    let context = context || window
+    context.fn = this
+    let args = [...arguments].slice(1)
+    let result
+    // 需要判断是否存储第二个参数
+    // 如果存在，就将第二个参数展开
+    if (arguments[1]) {
+    result = context.fn(...arguments[1])
+    } else {
+    result = context.fn()
+    }
+    delete context.fn
+    return result
+}
+//bind
+Function.prototype.myBind = function(context){
+    if(typeof this !== 'function'){
+        throw new TypeError('Error')
+    }
+    let _this = this
+    let args = [...arguments].slice(1)
+    return function F(){
+    // 因为返回了一个函数，我们可以 new F()，所以需要判断
+        if(this instanceof F){
+            return new _this(...args, ...arguments)
+        }
+        return _this.apply(context, args.concat(...arguments)
+    }
+}
+</code></pre>
+<h3 id="深克隆">深克隆</h3>
+<p>一般情况下使用<code>JSON.parse(JSON.stringify(object))</code>即可，但是会有几个缺陷</p>
+<ul>
+<li>会忽略 undefined</li>
+<li>不能序列化函数</li>
+<li>不能解决循环引用的对象</li>
+</ul>
+<pre><code class="language-js">function isObject(o) {
+  return (typeof o === &quot;object&quot; || typeof o === &quot;function&quot;) &amp;&amp; o !== null;
+}
+
+//常规
+function deepClone(obj) {
+  if (!isObject(obj)) {
+    throw new Error(&quot;不是对象&quot;);
+  }
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [] : {};
+  for (let key in obj) {
+    cloneObj[key] = isObject(obj[key]) ? deepClone(obj[key]) : obj[key];
+  }
+  return cloneObj;
+}
+
+//含有Symbol属性则需要使用Reflect
+
+function deepClone1(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [...obj] : { ...obj };
+  Reflect.ownKeys(cloneObj).forEach(key =&gt; {
+    cloneObj[key] = isObject(obj[key]) ? deepClone1(obj[key]) : obj[key];
+  });
+  return cloneObj;
+}
+
+//如果是循环引用则使用loadsh， loadsh使用栈存储对象，然后进行比较
+//使用hash存储
+function deepClone2(obj, hash = new WeakMap()) {
+  if (!isObject(obj)) {
+    return obj;
+  }
+  if (hash.has(obj)) return hash.get(obj);
+
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [] : {};
+
+  hash.set(obj, cloneObj);
+
+  let result = Object.keys(obj).map(key =&gt; {
+    return {
+      [key]: deepClone2(obj[key], hash)
+    };
+  });
+
+  return Object.assign(cloneObj, ...result);
+}
+</code></pre>
+<h3 id="debounce">debounce</h3>
+<p>防抖的实质则是最后一个触发函数开始计时执行</p>
+<pre><code class="language-js">function debounce(fn, delay) {
+  let timer = null;
+  return function() {
+    let context = this;
+    let args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() =&gt; {
+      fn.apply(context, args);
+    }, delay);
+  };
+}
+</code></pre>
+<p>优化：有需要第一次调用立刻触发的需求</p>
+<pre><code class="language-js">function debounce(fnuc, wait = 50, immediate = true) {
+  let timer, context, args
+  const later = () =&gt; setTimeout(() =&gt; {
+    timer = null
+    if(!immediate) {
+      func.apply(context, args)
+      context = args = null
+    }
+  },wait)
+  return function(...params){
+    if(!timer) {
+      timer = later()
+      //有则立刻执行，否则缓存上下文
+      if(immediate){
+        fnuc.apply(this, params)
+      }else{
+        context = this
+        args = params
+      }
+    }else{
+      clearTimeout(timer)
+      timer = later()
+    }
+  }
+}
+</code></pre>
+<h3 id="throttle">throttle</h3>
+<p>节流的实质则是第一个触发函数开始计时执行,相当于每隔一段时间执行一次</p>
+<pre><code class="language-js">function throttle(fn, interval){
+  let last = 0
+  return function(){
+    let context = this
+    let args = arguments
+    let now = +new Date()
+    if(now - last &gt;= interval) {
+      last = now;
+      fn.apply(context,this)
+    }
+  }
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/http-1">
+                <h3 class="post-title">
+                  前端性能优化原理与实践
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge ">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

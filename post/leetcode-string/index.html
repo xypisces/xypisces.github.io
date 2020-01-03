@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>leetcode初级算法-字符串篇JavaScript实现 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>leetcode初级算法-字符串篇JavaScript实现</h1>
+            <p class="article-meta">
+              2018-02-14
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge ">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>字符串说到底还是数组的思想，主要掌握自带的api，学会灵活运用</p>
+<!-- more -->
+<h3 id="反转字符串">反转字符串</h3>
+<p>编写一个函数，其作用是将输入的字符串反转过来。</p>
+<pre><code>输入: &quot;hello&quot;
+输出: &quot;olleh&quot;
+输入: &quot;A man, a plan, a canal: Panama&quot;
+输出: &quot;amanaP :lanac a ,nalp a ,nam A&quot;
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseString = function(s) {
+    //利用api
+    return s.split('').reverse().join('')
+    //暴力解法
+    let arr = []
+    let newString = ''
+    for(let i of s) {
+      arr.push(i)
+    }
+    for(let i=arr.length-1; i&gt;=0; i--){
+      newString+=arr[i]
+    }
+    return newString
+};
+</code></pre>
+<h3 id="字符串中的第一个唯一字符">字符串中的第一个唯一字符</h3>
+<p>给定一个字符串，找到它的第一个不重复的字符，并返回它的索引。如果不存在，则返回 -1。</p>
+<p>您可以假定该字符串只包含小写字母。</p>
+<pre><code>s = &quot;leetcode&quot;
+返回 0.
+
+s = &quot;loveleetcode&quot;,
+返回 2.
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {number}
+ */
+var firstUniqChar = function(s) {
+    //优化
+    for(var i = 0 ; i &lt; s.length;i++){
+        if(s.indexOf(s[i]) == s.lastIndexOf(s[i])){
+           return i
+        }
+    }
+    return -1
+    //暴力解法
+    let arr = []
+    let arr1 = []
+    for(let i of s) {
+      arr.push(i)
+    }
+    let l = arr.length;
+    for(let i=0; i&lt;l; i++){
+      let key = arr.shift()
+      if(arr.indexOf(key) === -1 &amp;&amp; arr1.indexOf(key) === -1){
+        return i;
+      }
+      arr1.push(key)
+    }
+    return -1;
+};
+</code></pre>
+<h3 id="字符串转换整数-atoi">字符串转换整数 (atoi)</h3>
+<p>请你来实现一个 atoi 函数，使其能将字符串转换成整数。</p>
+<p>首先，该函数会根据需要丢弃无用的开头空格字符，直到寻找到第一个非空格的字符为止。</p>
+<p>当我们寻找到的第一个非空字符为正或者负号时，则将该符号与之后面尽可能多的连续数字组合起来，作为该整数的正负号；假如第一个非空字符是数字，则直接将其与之后连续的数字字符组合起来，形成整数。</p>
+<p>该字符串除了有效的整数部分之后也可能会存在多余的字符，这些字符可以被忽略，它们对于函数不应该造成影响。</p>
+<p>注意：假如该字符串中的第一个非空格字符不是一个有效整数字符、字符串为空或字符串仅包含空白字符时，则你的函数不需要进行转换。</p>
+<p>在任何情况下，若函数不能进行有效的转换时，请返回 0。</p>
+<p>说明：</p>
+<p>假设我们的环境只能存储 32 位大小的有符号整数，那么其数值范围为 [−231,  231 − 1]。如果数值超过这个范围，请返回  INT_MAX (231 − 1) 或 INT_MIN (−231) 。</p>
+<pre><code>输入: &quot;42&quot;
+输出: 42
+
+输入: &quot;words and 987&quot;
+输出: 0
+解释: 第一个非空字符是 'w', 但它不是数字或正、负号。因此无法执行有效的转换。
+
+输入: &quot;-91283472332&quot;
+输出: -2147483648
+解释: 数字 &quot;-91283472332&quot; 超过 32 位有符号整数范围。因此返回 INT_MIN (−231) 。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} str
+ * @return {number}
+ */
+var myAtoi = function(str) {
+    let MAX = Math.pow(2,31)
+    let MIN = -Math.pow(2,31)
+    let num = 0
+    let sign = 1 //是否是正数
+    let n = str.length //字符串长度
+    let i = 0 //下标指针
+    if( n === 0 ) return 0
+    while( i&lt;n &amp;&amp; str.charAt(i) == ' ') i++
+    if(str.charAt(i) == '+') {
+      i++
+    }else if (str.charAt(i) == '-') {
+      i++
+      sign = -1
+    }
+    for(; i&lt;n; i++){
+      if(str.charAt(i) &lt; '0' || str.charAt(i) &gt; '9') break;
+      if(num &gt; Math.floor(MAX/10) || (num == Math.floor(MAX/10) &amp;&amp; Number(str.charAt(i)) &gt;= MAX % 10)) {
+        return sign == -1 ? MIN : MAX - 1
+      }
+      num = num * 10 + Number(str.charAt(i))
+    }
+    return num * sign
+};
+</code></pre>
+<h3 id="实现strstr">实现strStr()</h3>
+<p>给定一个 haystack 字符串和一个 needle 字符串，在 haystack 字符串中找出 needle 字符串出现的第一个位置 (从0开始)。如果不存在，则返回  -1。<br>
+当 needle 是空字符串时我们应当返回 0 。</p>
+<pre><code>输入: haystack = &quot;hello&quot;, needle = &quot;ll&quot;
+输出: 2
+
+输入: haystack = &quot;aaaaa&quot;, needle = &quot;bba&quot;
+输出: -1
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    //优化
+    return haystack.indexOf(needle)
+    //暴力解法
+    if(needle.length === 0) return 0
+    for(let i=0; i&lt;haystack.length; i++){
+      let j = i
+      let k = 0
+      while(j&lt;haystack.length &amp;&amp; k&lt;needle.length &amp;&amp; haystack.charAt(j) === needle.charAt(k)){
+        j++
+        k++
+      }
+      if(k === needle.length) return i
+    }
+    return -1
+};
+</code></pre>
+<h3 id="整数反转">整数反转</h3>
+<p>给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。</p>
+<pre><code>输入: 123
+输出: 321
+
+输入: -123
+输出: -321
+
+输入: 120
+输出: 21
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+  let MAX = Math.pow(2,31)
+  let MIN = -Math.pow(2,31)
+  let num = 0 //反转后的值
+  let sign = 1 //正负的标志值
+  let k = 0 //是否有负
+  let str = x + '' //转换为字符串
+  let n = str.length
+  if(n === 0) return 0
+  if(str.charAt(0) === '-') {
+    sign = -1
+    k = 1
+  }
+  for(var i = n-1; i&gt;=k; i--){
+    if(num &gt; Math.floor(MAX/10) || (num === Math.floor(MAX/10) &amp;&amp; Number(str.charAt(i)) &gt;= Math.floor(MAX%10))) {
+      return 0
+    }
+    num = num * 10 + Number(str.charAt(i))
+  }
+  return num * sign
+};
+</code></pre>
+<h3 id="有效的字母异位词">有效的字母异位词</h3>
+<p>给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的一个字母异位词。<br>
+你可以假设字符串只包含小写字母。<br>
+如果输入字符串包含 unicode 字符怎么办？你能否调整你的解法来应对这种情况？</p>
+<pre><code>输入: s = &quot;anagram&quot;, t = &quot;nagaram&quot;
+输出: true
+
+输入: s = &quot;rat&quot;, t = &quot;car&quot;
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    let i = 0
+    let k = 0
+    let newT = t
+    if(s.length !== t.length) return false
+    for(let j=0; j&lt;s.length; j++){
+      i++
+      if(newT.indexOf(s.charAt(j)) !== -1) {
+        k++
+        newT = newT.replace(s.charAt(j),'')
+      }
+    }
+    if(i === k){
+      return true
+    }
+    return false
+};
+</code></pre>
+<h3 id="最长公共前缀">最长公共前缀</h3>
+<p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
+<p>如果不存在公共前缀，返回空字符串 &quot;&quot;。</p>
+<pre><code>输入: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;]
+输出: &quot;fl&quot;
+
+输入: [&quot;dog&quot;,&quot;racecar&quot;,&quot;car&quot;]
+输出: &quot;&quot;
+解释: 输入不存在公共前缀。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    let str = ''
+    if(strs.length === 0) return &quot;&quot;
+    for(let i=0; i&lt;strs[0].length; i++){
+      let s = strs[0].charAt(i)
+      let sign = 1
+      for(let j=0; j&lt;strs.length; j++){
+        if(s !== strs[j].charAt(i)) {
+          sign = -1
+          break;
+        }
+      }
+      if(sign === -1) break;
+      str += s
+    }
+    return str
+};
+</code></pre>
+<h3 id="验证回文字符串">验证回文字符串</h3>
+<p>给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。</p>
+<p>说明：本题中，我们将空字符串定义为有效的回文串。</p>
+<pre><code>输入: &quot;A man, a plan, a canal: Panama&quot;
+输出: true
+输入: &quot;race a car&quot;
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+  // 利用api
+  const _s = s.replace(/[^a-z0-9]/gi,'').toLowerCase();
+  return _s.split('').reverse().join('') == _s
+  // 初始的暴力解法思路
+  if(s === &quot;&quot;) return true
+  let arr = []
+  let s1 = ''
+  let s2 = ''
+  let newS = s.toLocaleLowerCase().replace(/\W/g,'')
+  for(let i=0; i&lt;newS.length; i++){
+    if(newS.charAt(i) !== '_'){
+      arr.push(newS.charAt(i))
+      s1 += newS.charAt(i)
+    }
+  }
+  for(let j=arr.length-1; 0&lt;=j; j--){
+    s2 += arr[j]
+  }
+  if(s1 === s2){
+    return true
+  }
+  return false
+};
+</code></pre>
+<h3 id="报数">报数</h3>
+<p>报数序列是一个整数序列，按照其中的整数的顺序进行报数，得到下一个数。其前五项如下：</p>
+<pre><code>1.     1
+2.     11
+3.     21
+4.     1211
+5.     111221
+
+输入: 4
+输出: &quot;1211&quot;
+</code></pre>
+<p>1 被读作  &quot;one 1&quot;  (&quot;一个一&quot;) , 即 11。<br>
+11 被读作 &quot;two 1s&quot; (&quot;两个一&quot;）, 即 21。<br>
+21 被读作 &quot;one 2&quot;,  &quot;one 1&quot; （&quot;一个二&quot; ,  &quot;一个一&quot;) , 即 1211。</p>
+<p>给定一个正整数 n（1 ≤ n ≤ 30），输出报数序列的第 n 项。</p>
+<p>注意：整数顺序将表示为一个字符串。</p>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {string}
+ */
+var countAndSay = function(n) {
+     var _str = '1';
+    for(var i=1;i&lt;n;i++){
+        _str = _str.match(/1+|2+|3+|4+|5+|6+|7+|8+|9+/g).map(v=&gt;''+v.length+v[0]).join('');
+    }
+    return _str
+};
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="http://localhost:4000/post/leetcode-array">
+                <h3 class="post-title">
+                  leetcode初级算法-数组篇JavaScript实现
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge success">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge ">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

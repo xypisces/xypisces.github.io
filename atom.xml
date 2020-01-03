@@ -1,0 +1,1666 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>http://localhost:4000</id>
+    <title>XuYu&apos;Blog</title>
+    <updated>2020-01-03T02:57:45.874Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="http://localhost:4000"/>
+    <link rel="self" href="http://localhost:4000/atom.xml"/>
+    <subtitle>&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;</subtitle>
+    <logo>http://localhost:4000/images/avatar.png</logo>
+    <icon>http://localhost:4000/favicon.ico</icon>
+    <rights>All rights reserved 2020, XuYu&apos;Blog</rights>
+    <entry>
+        <title type="html"><![CDATA[必知必会--浏览器安全知识]]></title>
+        <id>http://localhost:4000/post/xss</id>
+        <link href="http://localhost:4000/post/xss">
+        </link>
+        <updated>2018-07-14T13:30:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>前端涉及到的安全问题主要有二大块，xss攻击和csrf攻击，虽然前端发展至今已经有很多抵御这两种攻击的方式了，但也不是不能不了解的知识点</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>前端涉及到的安全问题主要有二大块，xss攻击和csrf攻击，虽然前端发展至今已经有很多抵御这两种攻击的方式了，但也不是不能不了解的知识点</p>
+<!-- more -->
+<h3 id="xss">XSS</h3>
+<p>xss主要有三种：反射型，存储型，DOM-based</p>
+<h4 id="攻击过程">攻击过程</h4>
+<p>通过修改HTML节点或者执行JS代码来攻击网站</p>
+<p>例如： <code>&lt;div&gt;{{name}}&lt;/div&gt;</code>, 如果name的值是一段js代码，那么在页面上就会被执行</p>
+<p>变成<code>&lt;div&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;&lt;/div&gt;</code>,比如提交表单的时候进行执行，这种就叫做存储性攻击，因为每个看到这个表单内容都会触发这个攻击，可以用来获取网站用户cookies保存到自己的服务器当中</p>
+<p>又或者在URl节点中嵌入JS代码</p>
+<pre><code class="language-html">http://www.domain.com?name=&lt;script&gt;alert(1)&lt;/script&gt;
+&lt;div&gt;{{name}}&lt;/div&gt;    
+</code></pre>
+<p>输入上面URL的时候，页面就多一段可执行的js脚本，这中叫做反射型攻击</p>
+<h4 id="如何防御">如何防御</h4>
+<ul>
+<li>对输入输出的代码进行转义处理</li>
+<li>针对富文本可以采用添加白名单进行过滤处理，避免有危险的标签</li>
+<li>CSP，在http头部添加content-security-policy进行控制（本质也是黑白名单控制）</li>
+</ul>
+<h3 id="csrf">CSRF</h3>
+<p>利用用户的登陆状态发起恶意请求</p>
+<h4 id="如何攻击">如何攻击</h4>
+<p>假设网站中有一个通过 Get 请求提交用户评论的接口，那么攻击者就可以在钓鱼网站中加入一个图片，图片的地址就是评论接口</p>
+<pre><code class="language-html">&lt;img src=&quot;http://www.domain.com/xxx?comment='attack'&quot;/&gt;
+</code></pre>
+<p>如果接口是 Post 提交的，需要用表单来提交接口</p>
+<pre><code class="language-html">&lt;form action=&quot;http://www.domain.com/xxx&quot; id=&quot;CSRF&quot; method=&quot;post&quot;&gt;
+    &lt;input name=&quot;comment&quot; value=&quot;attack&quot; type=&quot;hidden&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<h4 id="如何防御-2">如何防御</h4>
+<ul>
+<li>get请求无法修改数据</li>
+<li>不让第三方网站访问到cookie，比如sameSite（cookie不会跨域请求携带）</li>
+<li>阻止第三方网站请求接口， 比如 referer （验证请求来源）</li>
+<li>请求时附带信息，比如token（服务器下发，每次请求时携带进行验证）</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript中常用的方法的相关实现]]></title>
+        <id>http://localhost:4000/post/useful-fn</id>
+        <link href="http://localhost:4000/post/useful-fn">
+        </link>
+        <updated>2018-05-16T11:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>本文涉及日常开发常用的方法的相关实现，在面试中也是经常能够被问到的</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>本文涉及日常开发常用的方法的相关实现，在面试中也是经常能够被问到的</p>
+<!-- more -->
+<ul>
+<li>new</li>
+<li>object.create</li>
+<li>instanceof</li>
+<li>bind</li>
+<li>深克隆</li>
+<li>debounce</li>
+<li>throttle</li>
+</ul>
+<h3 id="new">new</h3>
+<p>new 的实质过程：</p>
+<ul>
+<li>生成一个新的空对象</li>
+<li>链接到原型</li>
+<li>绑定 this</li>
+<li>返回新对象</li>
+</ul>
+<pre><code class="language-js">function new(){
+    let obj = {}
+    let Con = [].prototype.shift.call(arguments)
+    obj.__proto__ = Con.prototype
+    let result = Con.apply(obj,arguments)
+    return typeof result === 'object' ? result : obj
+}
+</code></pre>
+<h3 id="objectcreate">Object.create</h3>
+<p>object.create 的实质就是构建一个空的构造函数，将其原型指向参数对象，然后返回 F 的示例，从而实现继承的效果</p>
+<pre><code class="language-js">Object.create = function(obj) {
+  function F() {} // var B = {}
+  F.prototype = obj; // Object.setPrototypeOf(B,obj)  // B.__proto__ = obj
+  return new F(); // return B
+};
+</code></pre>
+<blockquote>
+<p>知识点，Object.creat 和 new 都可以创建对象，由上面可以看出区别在于 Object.create 创建的对象是基于传入的对象作为原型，其本身为一个空对象</p>
+</blockquote>
+<pre><code class="language-js">function Super() {
+  this.a = 2;
+}
+Super.prototype.getName = function() {
+  return 1;
+};
+const b = new Super();
+console.log(b); // { a: 2 }
+const c = Object.create(b);
+console.log(c); // {}
+</code></pre>
+<h3 id="instanceof">instanceof</h3>
+<p>instanceof 实质则是判断对象的原型链是不是能找到类型的 prototype</p>
+<pre><code class="language-js">function instanceof(left,right){
+    let prototype = right.prototype
+    left = left.__proto__
+    while(true){
+        if(left === null){return false}
+        if(prototype === left){return true}
+        left = left.__proto__
+    }
+}
+</code></pre>
+<h3 id="bind">bind</h3>
+<p>bind 实质是 call(this,'a','b')和 apply(this,['a','b'])的升级版，call 和 apply 直接执行，bind 则是返回一个函数</p>
+<pre><code class="language-js">//改变了 this 指向，让新的对象可以执行该函数。那么思路是否可以变成给新的对象添加一个函数，然后在执行完以后删除？
+//apply
+Function.prototype.apply = function(context){
+    let context = context || window
+    context.fn = this
+    let args = [...arguments].slice(1)
+    let result
+    // 需要判断是否存储第二个参数
+    // 如果存在，就将第二个参数展开
+    if (arguments[1]) {
+    result = context.fn(...arguments[1])
+    } else {
+    result = context.fn()
+    }
+    delete context.fn
+    return result
+}
+//bind
+Function.prototype.myBind = function(context){
+    if(typeof this !== 'function'){
+        throw new TypeError('Error')
+    }
+    let _this = this
+    let args = [...arguments].slice(1)
+    return function F(){
+    // 因为返回了一个函数，我们可以 new F()，所以需要判断
+        if(this instanceof F){
+            return new _this(...args, ...arguments)
+        }
+        return _this.apply(context, args.concat(...arguments)
+    }
+}
+</code></pre>
+<h3 id="深克隆">深克隆</h3>
+<p>一般情况下使用<code>JSON.parse(JSON.stringify(object))</code>即可，但是会有几个缺陷</p>
+<ul>
+<li>会忽略 undefined</li>
+<li>不能序列化函数</li>
+<li>不能解决循环引用的对象</li>
+</ul>
+<pre><code class="language-js">function isObject(o) {
+  return (typeof o === &quot;object&quot; || typeof o === &quot;function&quot;) &amp;&amp; o !== null;
+}
+
+//常规
+function deepClone(obj) {
+  if (!isObject(obj)) {
+    throw new Error(&quot;不是对象&quot;);
+  }
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [] : {};
+  for (let key in obj) {
+    cloneObj[key] = isObject(obj[key]) ? deepClone(obj[key]) : obj[key];
+  }
+  return cloneObj;
+}
+
+//含有Symbol属性则需要使用Reflect
+
+function deepClone1(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [...obj] : { ...obj };
+  Reflect.ownKeys(cloneObj).forEach(key =&gt; {
+    cloneObj[key] = isObject(obj[key]) ? deepClone1(obj[key]) : obj[key];
+  });
+  return cloneObj;
+}
+
+//如果是循环引用则使用loadsh， loadsh使用栈存储对象，然后进行比较
+//使用hash存储
+function deepClone2(obj, hash = new WeakMap()) {
+  if (!isObject(obj)) {
+    return obj;
+  }
+  if (hash.has(obj)) return hash.get(obj);
+
+  let isArray = Array.isArray(obj);
+  let cloneObj = isArray ? [] : {};
+
+  hash.set(obj, cloneObj);
+
+  let result = Object.keys(obj).map(key =&gt; {
+    return {
+      [key]: deepClone2(obj[key], hash)
+    };
+  });
+
+  return Object.assign(cloneObj, ...result);
+}
+</code></pre>
+<h3 id="debounce">debounce</h3>
+<p>防抖的实质则是最后一个触发函数开始计时执行</p>
+<pre><code class="language-js">function debounce(fn, delay) {
+  let timer = null;
+  return function() {
+    let context = this;
+    let args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() =&gt; {
+      fn.apply(context, args);
+    }, delay);
+  };
+}
+</code></pre>
+<p>优化：有需要第一次调用立刻触发的需求</p>
+<pre><code class="language-js">function debounce(fnuc, wait = 50, immediate = true) {
+  let timer, context, args
+  const later = () =&gt; setTimeout(() =&gt; {
+    timer = null
+    if(!immediate) {
+      func.apply(context, args)
+      context = args = null
+    }
+  },wait)
+  return function(...params){
+    if(!timer) {
+      timer = later()
+      //有则立刻执行，否则缓存上下文
+      if(immediate){
+        fnuc.apply(this, params)
+      }else{
+        context = this
+        args = params
+      }
+    }else{
+      clearTimeout(timer)
+      timer = later()
+    }
+  }
+}
+</code></pre>
+<h3 id="throttle">throttle</h3>
+<p>节流的实质则是第一个触发函数开始计时执行,相当于每隔一段时间执行一次</p>
+<pre><code class="language-js">function throttle(fn, interval){
+  let last = 0
+  return function(){
+    let context = this
+    let args = arguments
+    let now = +new Date()
+    if(now - last &gt;= interval) {
+      last = now;
+      fn.apply(context,this)
+    }
+  }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[前端性能优化原理与实践]]></title>
+        <id>http://localhost:4000/post/http-1</id>
+        <link href="http://localhost:4000/post/http-1">
+        </link>
+        <updated>2018-04-16T12:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>url从输入到页面到底发生了什么，这几乎是面试必考题，当你回答出来了，然后面试官问你怎么针对性优化，你还能答得上来么？</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>url从输入到页面到底发生了什么，这几乎是面试必考题，当你回答出来了，然后面试官问你怎么针对性优化，你还能答得上来么？</p>
+<!-- more -->
+<h3 id="url-页面的生成过程">url-&gt;页面的生成过程</h3>
+<ul>
+<li>DNS查询,返回IP地址</li>
+<li>TCP三次握手，应用层将数据传到传输层，TCP指明端口号，下发到网络层的IP协议确定IP地址，下发到数据链路层封装数据帧，最后是物理层面的传输</li>
+<li>如果有HTTPS则还会进行TLS握手，然后进行真正的传输</li>
+<li>如果有负载均衡的服务器，则将请求分发到多个服务器，</li>
+<li>假设服务器响应一个文件，浏览器会先判断状态码，200则进行解析，300则进行重定向，400或500则报错</li>
+<li>如果是gizp等格式则会解压一下，然后通过文件编码去解析</li>
+<li>HTML文件则会构建DOM树，CSS树，遇到JS文件会先判断async还是defer进行下载，如果什么都没有则会阻塞渲染直到JS执行</li>
+<li>HTML完全加载解析后触发DOMContentLoaded树</li>
+<li>CSS树和DOM树构建完成生成render树</li>
+<li>最后调用GPU绘制，合成图层，显示到屏幕中</li>
+</ul>
+<h3 id="图片层面的优化">图片层面的优化</h3>
+<p>针对不同场景的图片，使用不同的格式能对网站可以有很大的提升，下面的总结的是各个格式的适用场景</p>
+<ul>
+<li>JPEG/JPG: 有损压缩，适用于大图，色彩丰富的图片</li>
+<li>PNG: 无损压缩，支持透明，适用于小图Logo等</li>
+<li>SVG: 文本文件，体积小，兼容性好，适用于简单图形icon等</li>
+<li>Base64: 文本文件，与svg一样，小于2kb的图片可以使用base64，减少请求</li>
+<li>WebP: 全能型，但是兼容性不好</li>
+</ul>
+<h3 id="http缓存机制">HTTP缓存机制</h3>
+<p>HTTP 缓存是我们日常开发中最为熟悉的一种缓存机制。它又分为强缓存和协商缓存。优先级较高的是强缓存，在命中强缓存失败的情况下，才会走协商缓存。</p>
+<h4 id="强缓存">强缓存</h4>
+<ul>
+<li>expires</li>
+</ul>
+<p><code>expires: Wed, 11 Sep 2019 16:12:18 GMT</code></p>
+<p>expires是一个时间戳，当本地时间小于expries设置的时间，则会去缓存中取，缺点就是如果直接修改本地时间，则expries就会达不到想要预期，因此诞生了cache-control</p>
+<ul>
+<li>cache-control</li>
+</ul>
+<p><code>cache-control: max-age=31536000</code></p>
+<p>cache-control优先级比较高，max-age是一个时间长度，在这里时间长度以内的请求的资源都从缓存中取</p>
+<h4 id="协商缓存">协商缓存</h4>
+<ul>
+<li>Last-Modified</li>
+</ul>
+<p>首次请求后会返回<code>Last-Modified: Fri, 27 Oct 2017 06:35:57 GMT</code> ，随后发起请求后回带上<code>If-Modified-Since: Fri, 27 Oct 2017 06:35:57 GMT</code>，当服务端判断该时间戳和资源在服务器最后修改的时间是否一致，从而判断是否发生变化。</p>
+<p>存在的缺点就是1.编辑了文件，但是内容没变，服务端无法识别，只通过时间修改判断，从而会被重新请求。2.修改过快也会导致服务端感知不到（识别秒级以上的差异）</p>
+<ul>
+<li>Etag</li>
+</ul>
+<p>首次请求后会返回<code>ETag: W/&quot;2a3b-1602480f459&quot;</code> ，随后发起请求后回带上<code>If-None-Match: W/&quot;2a3b-1602480f459&quot;</code>，Etag 的生成过程需要服务器额外付出开销，会影响服务端的性能，这是它的弊端。因此启用 Etag 需要我们审时度势。</p>
+<h3 id="选择合适的缓存策略">选择合适的缓存策略</h3>
+<ul>
+<li>对于某些不需要缓存的资源，可以使用 <code>Cache-control: no-store</code>，表示该资源不需要缓存</li>
+<li>对于频繁变动的资源，可以使用 <code>Cache-Control: no-cache</code> 并配合 <code>ETag</code> 使用，表示该资源已被缓存，但是每次都会发送请求询问资源是否更新。</li>
+<li>对于代码文件来说，通常使用 <code>Cache-Control: max-age=31536000</code> 并配合策略缓存使用，然后对文件进行指纹处理，一旦文件名变动就会立刻下载新的文件。</li>
+</ul>
+<h3 id="浏览器渲染过程">浏览器渲染过程</h3>
+<p>解析HTML-&gt;计算样式-&gt;计算图层布局-&gt;绘制图层-&gt;GUP渲染得到页面</p>
+<p>优化点：</p>
+<ul>
+<li>由于css选择器是从右往左边开始匹配，因此要避免过深的嵌套，少用标签选择器，会全局搜索匹配，浪费性能，多用类选择器</li>
+<li>HTML，CSS，JS都会堵塞，从上至下的进行渲染，因此css尽量放到头部，js放到尾部</li>
+<li>js有三种加载方式:正常加载，defer加载(异步加载，等文档解析完全后再执行。当脚本依赖于 DOM 元素和其它脚本的执行结果时，我们会选用 defer)， async加载(异步加载，加载结束就执行，一般当我们的脚本与 DOM 元素和其它脚本之间的依赖关系不强时，我们会选用 async)</li>
+</ul>
+<h3 id="重绘与回流">重绘与回流</h3>
+<ul>
+<li>重绘：当节点需要更改外观而不会影响布局的，如改变颜色</li>
+<li>回流：布局或者几何属性需要改变就称为回流，如改变大小</li>
+</ul>
+<p>重绘不一定会引发回流，但是回流一定会引发重绘。下面几个操作就会导致回流和重绘</p>
+<ul>
+<li>改变window大小</li>
+<li>改变字体大小</li>
+<li>添加或删除样式</li>
+<li>文字改变</li>
+<li>定位或者浮动</li>
+<li>盒模型修改</li>
+</ul>
+<blockquote>
+<p>浏览器一帧中发生了什么？<br>
+1.Event loop执行完Microtasks会判断document是否需要更新<br>
+2.判断resize或者scroll时间<br>
+3.判断是否触发了media query<br>
+4.更新动画并且发送事件<br>
+5.判断是否有全屏操作<br>
+6.执行 requestAnimationFrame 回调<br>
+7.执行 intersectionObserver回调判断元素是否可见<br>
+8.更新界面</p>
+</blockquote>
+<h3 id="面试题">面试题</h3>
+<p>如何渲染几万条数据并不卡住界面</p>
+<pre><code class="language-js">setTimeout(()=&gt;{
+  const total = 100000
+  const once = 20
+  const loopCount = total / once
+  let countOfRender = 0
+  let ul = document.querySelector('ul')
+  function add(){
+    const fragment = document.createDocumentFragment()
+    for(let i=0; i&lt;once; i++){
+      const li = document.createElement('li')
+      li.innerText = Marh.floor(Math.random() * total)
+      fragment.appendChild(li)
+    }
+    ul.appendChild(fragment)
+    countOfRender += 1
+    loop()
+  }
+  function loop(){
+    if(countOfRender &lt; loopCount) {
+      window.requestAnimationFrame(add)
+    }
+  }
+},0)
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[leetcode初级算法-数学篇和排序搜索篇JavaScript实现]]></title>
+        <id>http://localhost:4000/post/leetcode-math</id>
+        <link href="http://localhost:4000/post/leetcode-math">
+        </link>
+        <updated>2018-02-21T14:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>考察基本的数学思维和基本的排序算法</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>考察基本的数学思维和基本的排序算法</p>
+<!-- more -->
+<h3 id="合并两个有序数组">合并两个有序数组</h3>
+<p>给定两个有序整数数组 nums1 和 nums2，将 nums2 合并到 nums1 中，使得 num1 成为一个有序数组。</p>
+<pre><code>输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+输出: [1,2,2,3,5,6]
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    for(let i = 0; i&lt;n; i++) {
+        nums1[m+i] = nums2[i]
+    }
+    nums1.sort(function(a,b){
+        return a-b
+    })
+};
+</code></pre>
+<h3 id="第一个错误的版本">第一个错误的版本</h3>
+<p>你是产品经理，目前正在带领一个团队开发新的产品。不幸的是，你的产品的最新版本没有通过质量检测。由于每个版本都是基于之前的版本开发的，所以错误的版本之后的所有版本都是错的。</p>
+<p>假设你有 n 个版本 [1, 2, ..., n]，你想找出导致之后所有版本出错的第一个错误的版本。</p>
+<p>你可以通过调用 bool isBadVersion(version) 接口来判断版本号 version 是否在单元测试中出错。实现一个函数来查找第一个错误的版本。你应该尽量减少对调用 API 的次数</p>
+<pre><code>给定 n = 5，并且 version = 4 是第一个错误的版本。
+
+调用 isBadVersion(3) -&gt; false
+调用 isBadVersion(5) -&gt; true
+调用 isBadVersion(4) -&gt; true
+
+所以，4 是第一个错误的版本。
+</code></pre>
+<p>分析： 就是二分查找法，维护两个指针，依次二分，找到最终的点</p>
+<pre><code class="language-js">/**
+ * Definition for isBadVersion()
+ * 
+ * @param {integer} version number
+ * @return {boolean} whether the version is bad
+ * isBadVersion = function(version) {
+ *     ...
+ * };
+ */
+
+/**
+ * @param {function} isBadVersion()
+ * @return {function}
+ */
+var solution = function(isBadVersion) {
+    /**
+     * @param {integer} n Total versions
+     * @return {integer} The first bad version
+     */
+    return function(n) {
+        if(n &lt;= 0) return 0
+        let l = 1, r=n
+        while(l&lt;r){
+          let mid = Math.floor((l+r)/2)
+          if(isBadVersion(mid)){
+            r = mid
+          }else{
+            l = mid + 1
+          }
+        }
+        return l
+    };
+};
+</code></pre>
+<h3 id="3的幂">3的幂</h3>
+<p>给定一个整数，写一个函数来判断它是否是 3 的幂次方。你能不使用循环或者递归来完成本题吗？</p>
+<pre><code>输入: 9
+输出: true
+输入: 45
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isPowerOfThree = function(n) {
+    let s = n
+    while(1){
+        if(s === 1){
+            return true
+        }else if(s &lt; 1) {
+            return false
+        }
+        s = s/3
+    }
+    //不使用递归
+    let s = Math.log10(n)/Math.log10(3)
+    return s-Math.floor(s) === 0
+};
+</code></pre>
+<h3 id="计数质数">计数质数</h3>
+<p>统计所有小于非负整数 n 的质数的数量。</p>
+<pre><code>输入: 10
+输出: 4
+解释: 小于 10 的质数一共有 4 个, 它们是 2, 3, 5, 7 。
+</code></pre>
+<p>分析：</p>
+<ul>
+<li>质数只能被1和他本身整除</li>
+<li>例子：如16= 1<em>16，2</em>8，4<em>4，8</em>2，16<em>1，如25= 1</em>25，5<em>5，25</em>1</li>
+<li>由上面例子可以知道，i*j=n的过程中，存在一个开平方k，只需判断k之前是否有其他整除树即可，从而减少循环的次数</li>
+<li>首先排除除2之外的偶数，然后遍历k之前树，如果有整除则跳过，没有则count加一</li>
+</ul>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let count = 0
+    for(let i = 2; i&lt;n; i++){
+      if(i == 2) count++;
+      if(i % 2 == 0) continue
+      let isPrime = true
+      for(let j=3; j&lt;=Math.sqrt(i); j+=2) {
+        if(i % j === 0) {
+          isPrime = false;
+          break
+        }
+      }
+      if(isPrime) {
+        count++
+      }
+    }
+    return count
+};
+</code></pre>
+<h3 id="fizz-buzz">Fizz Buzz</h3>
+<p>写一个程序，输出从 1 到 n 数字的字符串表示。</p>
+<ol>
+<li>
+<p>如果 n 是3的倍数，输出“Fizz”；</p>
+</li>
+<li>
+<p>如果 n 是5的倍数，输出“Buzz”；</p>
+</li>
+<li>
+<p>如果 n 同时是3和5的倍数，输出 “FizzBuzz”。</p>
+</li>
+</ol>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var fizzBuzz = function(n) {
+    let arr = []
+    for(let i=1; i&lt;=n; i++){
+      if(i%3===0 &amp;&amp; i%5 === 0){
+        arr.push('FizzBuzz')
+      }else if(i % 3 === 0) {
+        arr.push('Fizz')
+      }else if(i % 5 === 0) {
+        arr.push('Buzz')
+      }else{
+        arr.push(i+'')
+      }
+    }
+    return arr
+};
+</code></pre>
+<h3 id="罗马数字转整数">罗马数字转整数</h3>
+<pre><code>字符          数值
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+</code></pre>
+<p>例如， 罗马数字 2 写做 II ，即为两个并列的 1。12 写做 XII ，即为 X + II 。 27 写做  XXVII, 即为 XX + V + II 。</p>
+<p>通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 IIII，而是 IV。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 IX。这个特殊的规则只适用于以下六种情况：</p>
+<p>I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。<br>
+X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。<br>
+C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。<br>
+给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。</p>
+<pre><code>输入: &quot;III&quot;
+输出: 3
+输入: &quot;LVIII&quot;
+输出: 58
+解释: L = 50, V= 5, III = 3.
+输入: &quot;MCMXCIV&quot;
+输出: 1994
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+</code></pre>
+<p>解法1:</p>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+  //暴力解法1
+  let count = 0;
+  let i = 0
+  while(i&lt;s.length){
+    switch(s.charAt(i)){
+      case 'M':
+        count+=1000
+        i++;
+        break;
+      case 'D':
+        count+=500
+        i++;
+        break;
+      case 'C':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1) === 'D'){
+          count+=400
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1) === 'M'){
+          count+=900
+          i+=2
+        }else{
+          count+=100
+          i+=1
+        }
+        break;
+      case 'L':
+        count+=50;
+        i++;
+        break;
+      case 'X':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'L'){
+          count+=40
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'C'){
+          count+=90
+          i+=2
+        }else{
+          count+=10
+          i+=1
+        }
+        break;
+      case 'V':
+        count+=5;
+        i++;
+        break;
+      case 'I':
+        if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'V'){
+          count+=4
+          i+=2
+        }else if(i&lt;s.length &amp;&amp; s.charAt(i+1)  === 'X'){
+          count+=9
+          i+=2
+        }else{
+          count+=1
+          i+=1
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return count
+};
+</code></pre>
+<p>解法2:</p>
+<pre><code class="language-js">//数组索引法
+  let roman = ['I','V','X','L','C','D','M','IV','IX','XL','XC','CD','CM']
+  let num = [1,5,10,50,100,500,1000,4,9,40,90,400,900]
+  let count = 0
+  let i = 0
+  while(i&lt;s.length){
+    let index = roman.indexOf(s.charAt(i))
+    let index2 = roman.indexOf(s.charAt(i)+s.charAt(i+1))
+    if(index2 !== -1) {
+      count += num[index2]
+      i+=2
+    }else{
+      count += num[index]
+      i+=1
+    }
+  }
+  return count
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[leetcode初级算法-字符串篇JavaScript实现]]></title>
+        <id>http://localhost:4000/post/leetcode-string</id>
+        <link href="http://localhost:4000/post/leetcode-string">
+        </link>
+        <updated>2018-02-14T13:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>字符串说到底还是数组的思想，主要掌握自带的api，学会灵活运用</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>字符串说到底还是数组的思想，主要掌握自带的api，学会灵活运用</p>
+<!-- more -->
+<h3 id="反转字符串">反转字符串</h3>
+<p>编写一个函数，其作用是将输入的字符串反转过来。</p>
+<pre><code>输入: &quot;hello&quot;
+输出: &quot;olleh&quot;
+输入: &quot;A man, a plan, a canal: Panama&quot;
+输出: &quot;amanaP :lanac a ,nalp a ,nam A&quot;
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseString = function(s) {
+    //利用api
+    return s.split('').reverse().join('')
+    //暴力解法
+    let arr = []
+    let newString = ''
+    for(let i of s) {
+      arr.push(i)
+    }
+    for(let i=arr.length-1; i&gt;=0; i--){
+      newString+=arr[i]
+    }
+    return newString
+};
+</code></pre>
+<h3 id="字符串中的第一个唯一字符">字符串中的第一个唯一字符</h3>
+<p>给定一个字符串，找到它的第一个不重复的字符，并返回它的索引。如果不存在，则返回 -1。</p>
+<p>您可以假定该字符串只包含小写字母。</p>
+<pre><code>s = &quot;leetcode&quot;
+返回 0.
+
+s = &quot;loveleetcode&quot;,
+返回 2.
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {number}
+ */
+var firstUniqChar = function(s) {
+    //优化
+    for(var i = 0 ; i &lt; s.length;i++){
+        if(s.indexOf(s[i]) == s.lastIndexOf(s[i])){
+           return i
+        }
+    }
+    return -1
+    //暴力解法
+    let arr = []
+    let arr1 = []
+    for(let i of s) {
+      arr.push(i)
+    }
+    let l = arr.length;
+    for(let i=0; i&lt;l; i++){
+      let key = arr.shift()
+      if(arr.indexOf(key) === -1 &amp;&amp; arr1.indexOf(key) === -1){
+        return i;
+      }
+      arr1.push(key)
+    }
+    return -1;
+};
+</code></pre>
+<h3 id="字符串转换整数-atoi">字符串转换整数 (atoi)</h3>
+<p>请你来实现一个 atoi 函数，使其能将字符串转换成整数。</p>
+<p>首先，该函数会根据需要丢弃无用的开头空格字符，直到寻找到第一个非空格的字符为止。</p>
+<p>当我们寻找到的第一个非空字符为正或者负号时，则将该符号与之后面尽可能多的连续数字组合起来，作为该整数的正负号；假如第一个非空字符是数字，则直接将其与之后连续的数字字符组合起来，形成整数。</p>
+<p>该字符串除了有效的整数部分之后也可能会存在多余的字符，这些字符可以被忽略，它们对于函数不应该造成影响。</p>
+<p>注意：假如该字符串中的第一个非空格字符不是一个有效整数字符、字符串为空或字符串仅包含空白字符时，则你的函数不需要进行转换。</p>
+<p>在任何情况下，若函数不能进行有效的转换时，请返回 0。</p>
+<p>说明：</p>
+<p>假设我们的环境只能存储 32 位大小的有符号整数，那么其数值范围为 [−231,  231 − 1]。如果数值超过这个范围，请返回  INT_MAX (231 − 1) 或 INT_MIN (−231) 。</p>
+<pre><code>输入: &quot;42&quot;
+输出: 42
+
+输入: &quot;words and 987&quot;
+输出: 0
+解释: 第一个非空字符是 'w', 但它不是数字或正、负号。因此无法执行有效的转换。
+
+输入: &quot;-91283472332&quot;
+输出: -2147483648
+解释: 数字 &quot;-91283472332&quot; 超过 32 位有符号整数范围。因此返回 INT_MIN (−231) 。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} str
+ * @return {number}
+ */
+var myAtoi = function(str) {
+    let MAX = Math.pow(2,31)
+    let MIN = -Math.pow(2,31)
+    let num = 0
+    let sign = 1 //是否是正数
+    let n = str.length //字符串长度
+    let i = 0 //下标指针
+    if( n === 0 ) return 0
+    while( i&lt;n &amp;&amp; str.charAt(i) == ' ') i++
+    if(str.charAt(i) == '+') {
+      i++
+    }else if (str.charAt(i) == '-') {
+      i++
+      sign = -1
+    }
+    for(; i&lt;n; i++){
+      if(str.charAt(i) &lt; '0' || str.charAt(i) &gt; '9') break;
+      if(num &gt; Math.floor(MAX/10) || (num == Math.floor(MAX/10) &amp;&amp; Number(str.charAt(i)) &gt;= MAX % 10)) {
+        return sign == -1 ? MIN : MAX - 1
+      }
+      num = num * 10 + Number(str.charAt(i))
+    }
+    return num * sign
+};
+</code></pre>
+<h3 id="实现strstr">实现strStr()</h3>
+<p>给定一个 haystack 字符串和一个 needle 字符串，在 haystack 字符串中找出 needle 字符串出现的第一个位置 (从0开始)。如果不存在，则返回  -1。<br>
+当 needle 是空字符串时我们应当返回 0 。</p>
+<pre><code>输入: haystack = &quot;hello&quot;, needle = &quot;ll&quot;
+输出: 2
+
+输入: haystack = &quot;aaaaa&quot;, needle = &quot;bba&quot;
+输出: -1
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    //优化
+    return haystack.indexOf(needle)
+    //暴力解法
+    if(needle.length === 0) return 0
+    for(let i=0; i&lt;haystack.length; i++){
+      let j = i
+      let k = 0
+      while(j&lt;haystack.length &amp;&amp; k&lt;needle.length &amp;&amp; haystack.charAt(j) === needle.charAt(k)){
+        j++
+        k++
+      }
+      if(k === needle.length) return i
+    }
+    return -1
+};
+</code></pre>
+<h3 id="整数反转">整数反转</h3>
+<p>给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。</p>
+<pre><code>输入: 123
+输出: 321
+
+输入: -123
+输出: -321
+
+输入: 120
+输出: 21
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+  let MAX = Math.pow(2,31)
+  let MIN = -Math.pow(2,31)
+  let num = 0 //反转后的值
+  let sign = 1 //正负的标志值
+  let k = 0 //是否有负
+  let str = x + '' //转换为字符串
+  let n = str.length
+  if(n === 0) return 0
+  if(str.charAt(0) === '-') {
+    sign = -1
+    k = 1
+  }
+  for(var i = n-1; i&gt;=k; i--){
+    if(num &gt; Math.floor(MAX/10) || (num === Math.floor(MAX/10) &amp;&amp; Number(str.charAt(i)) &gt;= Math.floor(MAX%10))) {
+      return 0
+    }
+    num = num * 10 + Number(str.charAt(i))
+  }
+  return num * sign
+};
+</code></pre>
+<h3 id="有效的字母异位词">有效的字母异位词</h3>
+<p>给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的一个字母异位词。<br>
+你可以假设字符串只包含小写字母。<br>
+如果输入字符串包含 unicode 字符怎么办？你能否调整你的解法来应对这种情况？</p>
+<pre><code>输入: s = &quot;anagram&quot;, t = &quot;nagaram&quot;
+输出: true
+
+输入: s = &quot;rat&quot;, t = &quot;car&quot;
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    let i = 0
+    let k = 0
+    let newT = t
+    if(s.length !== t.length) return false
+    for(let j=0; j&lt;s.length; j++){
+      i++
+      if(newT.indexOf(s.charAt(j)) !== -1) {
+        k++
+        newT = newT.replace(s.charAt(j),'')
+      }
+    }
+    if(i === k){
+      return true
+    }
+    return false
+};
+</code></pre>
+<h3 id="最长公共前缀">最长公共前缀</h3>
+<p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
+<p>如果不存在公共前缀，返回空字符串 &quot;&quot;。</p>
+<pre><code>输入: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;]
+输出: &quot;fl&quot;
+
+输入: [&quot;dog&quot;,&quot;racecar&quot;,&quot;car&quot;]
+输出: &quot;&quot;
+解释: 输入不存在公共前缀。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    let str = ''
+    if(strs.length === 0) return &quot;&quot;
+    for(let i=0; i&lt;strs[0].length; i++){
+      let s = strs[0].charAt(i)
+      let sign = 1
+      for(let j=0; j&lt;strs.length; j++){
+        if(s !== strs[j].charAt(i)) {
+          sign = -1
+          break;
+        }
+      }
+      if(sign === -1) break;
+      str += s
+    }
+    return str
+};
+</code></pre>
+<h3 id="验证回文字符串">验证回文字符串</h3>
+<p>给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。</p>
+<p>说明：本题中，我们将空字符串定义为有效的回文串。</p>
+<pre><code>输入: &quot;A man, a plan, a canal: Panama&quot;
+输出: true
+输入: &quot;race a car&quot;
+输出: false
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+  // 利用api
+  const _s = s.replace(/[^a-z0-9]/gi,'').toLowerCase();
+  return _s.split('').reverse().join('') == _s
+  // 初始的暴力解法思路
+  if(s === &quot;&quot;) return true
+  let arr = []
+  let s1 = ''
+  let s2 = ''
+  let newS = s.toLocaleLowerCase().replace(/\W/g,'')
+  for(let i=0; i&lt;newS.length; i++){
+    if(newS.charAt(i) !== '_'){
+      arr.push(newS.charAt(i))
+      s1 += newS.charAt(i)
+    }
+  }
+  for(let j=arr.length-1; 0&lt;=j; j--){
+    s2 += arr[j]
+  }
+  if(s1 === s2){
+    return true
+  }
+  return false
+};
+</code></pre>
+<h3 id="报数">报数</h3>
+<p>报数序列是一个整数序列，按照其中的整数的顺序进行报数，得到下一个数。其前五项如下：</p>
+<pre><code>1.     1
+2.     11
+3.     21
+4.     1211
+5.     111221
+
+输入: 4
+输出: &quot;1211&quot;
+</code></pre>
+<p>1 被读作  &quot;one 1&quot;  (&quot;一个一&quot;) , 即 11。<br>
+11 被读作 &quot;two 1s&quot; (&quot;两个一&quot;）, 即 21。<br>
+21 被读作 &quot;one 2&quot;,  &quot;one 1&quot; （&quot;一个二&quot; ,  &quot;一个一&quot;) , 即 1211。</p>
+<p>给定一个正整数 n（1 ≤ n ≤ 30），输出报数序列的第 n 项。</p>
+<p>注意：整数顺序将表示为一个字符串。</p>
+<pre><code class="language-js">/**
+ * @param {number} n
+ * @return {string}
+ */
+var countAndSay = function(n) {
+     var _str = '1';
+    for(var i=1;i&lt;n;i++){
+        _str = _str.match(/1+|2+|3+|4+|5+|6+|7+|8+|9+/g).map(v=&gt;''+v.length+v[0]).join('');
+    }
+    return _str
+};
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[leetcode初级算法-数组篇JavaScript实现]]></title>
+        <id>http://localhost:4000/post/leetcode-array</id>
+        <link href="http://localhost:4000/post/leetcode-array">
+        </link>
+        <updated>2018-02-12T13:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>本文是关于leetcode初级算法中关于数组方面的问题并通过JavaScript实现</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>本文是关于leetcode初级算法中关于数组方面的问题并通过JavaScript实现</p>
+<!-- more -->
+<h3 id="两数之和">两数之和</h3>
+<p>给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。</p>
+<p>你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。</p>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    let arr = [];
+    for(let i=0; i &lt; nums.length; i++){
+        const idx = nums.indexOf(target - nums[i])
+        if( idx !== -1 &amp;&amp; idx !== i){
+            arr[0] = i
+            arr[1] = idx
+            break;
+        }
+    }
+    return arr
+}
+</code></pre>
+<h3 id="旋转数组">旋转数组</h3>
+<p>给定一个数组，将数组中的元素向右移动 k 个位置，其中 k 是非负数。</p>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var rotate = function(nums, k) {
+    let time = k % nums.length
+    if(time&gt;nums.length/2){
+      for(let i=0; i&lt;nums.length-time; i++){
+        let target = nums.shift()
+        nums.push(target)
+      }
+    }else{
+      for(let i=0; i&lt;time; i++){
+        let target = nums.pop()
+        nums.unshift(target)
+      }
+    }
+};
+</code></pre>
+<h3 id="只出现一次的数字">只出现一次的数字</h3>
+<p>给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。</p>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var singleNumber = function(nums) {
+    nums.sort()
+    for(let i=0; i&lt;nums.length; i+=2){
+      if(i+1&gt;nums.length){
+        return nums[i]
+      }
+      if(nums[i] !== nums[i+1]){
+        return nums[i]
+      }
+    }
+};
+</code></pre>
+<h3 id="两个数组的交集-ii">两个数组的交集 II</h3>
+<p>给定两个数组，编写一个函数来计算它们的交集。</p>
+<pre><code>输入: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+输出: [4,9]
+</code></pre>
+<ul>
+<li>输出结果中每个元素出现的次数，应与元素在两个数组中出现的次数一致。</li>
+<li>我们可以不考虑输出结果的顺序。</li>
+<li>如果给定的数组已经排好序呢？你将如何优化你的算法？</li>
+<li>如果 nums1 的大小比 nums2 小很多，哪种方法更优？</li>
+<li>如果 nums2 的元素存储在磁盘上，磁盘内存是有限的，并且你不能一次加载所有的元素到内存中，你该怎么办？</li>
+</ul>
+<pre><code class="language-js">/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[]}
+ */
+var intersect = function(nums1, nums2) {
+    let result = []
+    let arr1 = nums1.length&gt;nums2.length ? nums1 : nums2
+    let arr2 = nums1.length&gt;nums2.length ? nums2 : nums1
+    for(let i=0; i&lt;arr2.length; i++){
+      let k = arr1.indexOf(arr2[i])
+      if(k !== -1){
+        arr1[k] = null
+        result.push(arr2[i])
+      }
+    }
+    return result
+};
+</code></pre>
+<h3 id="从排序数组中删除重复项">从排序数组中删除重复项</h3>
+<p>给定一个排序数组，你需要在原地删除重复出现的元素，使得每个元素只出现一次，返回移除后数组的新长度。</p>
+<p>不要使用额外的数组空间，你必须在原地修改输入数组并在使用 O(1) 额外空间的条件下完成。</p>
+<pre><code>给定 nums = [0,0,1,1,1,2,2,3,3,4],
+
+函数应该返回新的长度 5, 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4。
+
+你不需要考虑数组中超出新长度后面的元素。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function(nums) {
+  if(nums.length === 0){
+      return 0
+    }
+    let number = 0;
+    for(let i=0; i&lt;nums.length; i++){
+        if(nums[i] !== nums[number]){
+            number++
+          nums[number] = nums[i]
+          
+        }
+    }
+    number+=1
+    return number
+    // nums = [...new Set(nums)]
+    // return nums.length
+};
+</code></pre>
+<h3 id="存在重复">存在重复</h3>
+<p>给定一个整数数组，判断是否存在重复元素。</p>
+<p>如果任何值在数组中出现至少两次，函数返回 true。如果数组中每个元素都不相同，则返回 false。</p>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var containsDuplicate = function(nums) {
+  let len = nums.length
+  for(let i=0; i&lt;len; i++){
+    let target = nums.pop()
+    if(nums.indexOf(target) !== -1){
+      return true
+    }
+  }
+  return false
+};
+</code></pre>
+<h3 id="加一">加一</h3>
+<p>给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。</p>
+<p>最高位数字存放在数组的首位， 数组中每个元素只存储一个数字。</p>
+<p>你可以假设除了整数 0 之外，这个整数不会以零开头。</p>
+<pre><code>输入: [4,3,2,1]
+输出: [4,3,2,2]
+解释: 输入数组表示数字 4321。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} digits
+ * @return {number[]}
+ */
+var plusOne = function(digits) {
+    let c = 1;
+    for(let i=digits.length - 1; i &gt;=0 ; i--) {
+      digits[i] += c
+      c = Math.floor(digits[i]/10)
+      digits[i] %= 10
+    }
+    if(c&gt;0) {
+      digits.unshift(c)
+    }
+    return digits
+};
+</code></pre>
+<h3 id="有效的数独">有效的数独</h3>
+<p>判断一个 9x9 的数独是否有效。只需要根据以下规则，验证已经填入的数字是否有效即可。</p>
+<ul>
+<li>数字 1-9 在每一行只能出现一次。</li>
+<li>数字 1-9 在每一列只能出现一次。</li>
+<li>数字 1-9 在每一个以粗实线分隔的 3x3 宫内只能出现一次。</li>
+</ul>
+<pre><code class="language-js">/**
+ * @param {character[][]} board
+ * @return {boolean}
+ */
+var isValidSudoku = function(board) {
+  for(let i=0; i&lt;board.length; i++){
+    if(!checked(board[i])) return false
+    let newArr = []
+    for(let j=0; j&lt;board[i].length; j++){
+      newArr.push(board[j][i])
+    }
+    if(!checked(newArr)) return false
+  }
+  for(let r = 0; r&lt;3; r++){
+    for(let c=0; c&lt;3; c++){
+      let arr3 = []
+      for(let i = r*3; i&lt;r*3+3; i++){
+        for(let j=c*3; j&lt;c*3+3; j++){
+          arr3.push(board[i][j])
+        }
+      }
+      if(!checked(arr3)) return false
+    }
+  }
+  return true
+};
+function checked(arr){
+  let newArr = arr.filter(i =&gt; i!=='.')
+  if(newArr.length !== [...new Set(newArr)].length){
+    return false
+  }
+  return true
+}
+</code></pre>
+<h3 id="旋转图像">旋转图像</h3>
+<p>给定一个 n × n 的二维矩阵表示一个图像。</p>
+<p>将图像顺时针旋转 90 度。</p>
+<pre><code>分析：首先沿着副对角线翻转一次，然后沿着水平中线翻转一次。
+</code></pre>
+<pre><code>给定 matrix = 
+[
+  [1,2,3],
+  [4,5,6],
+  [7,8,9]
+],
+
+原地旋转输入矩阵，使其变为:
+[
+  [7,4,1],
+  [8,5,2],
+  [9,6,3]
+]
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[][]} matrix
+ * @return {void} Do not return anything, modify matrix in-place instead.
+ */
+var rotate = function(matrix) {
+    const l = matrix.length
+    //先对角翻转
+    for(let i=0; i&lt;l; i++){
+      for(let j=0; j&lt;l-i; j++){
+        [matrix[i][j],matrix[l-j-1][l-i-1]] = [matrix[l-j-1][l-i-1],matrix[i][j]]
+      }
+    }
+    //再横向翻转
+    for(let i=0; i&lt;l/2; i++){
+      for(let j=0; j&lt;l; j++){
+        [matrix[i][j],matrix[l-i-1][j]] = [matrix[l-i-1][j],matrix[i][j]]
+      }
+    }
+};
+</code></pre>
+<h3 id="移动零">移动零</h3>
+<p>给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。必须在原数组上操作，不能拷贝额外的数组。</p>
+<pre><code>输入: [0,1,0,3,12]
+输出: [1,3,12,0,0]
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var moveZeroes = function(nums) {
+    let size = 0
+    for(let i=0; i&lt;nums.length; i++){
+      if(nums[i] === 0){
+        size++
+      }else if(size !== 0){
+        nums[i-size] = nums[i]
+        nums[i] = 0;
+      }
+    }
+    return nums
+};
+</code></pre>
+<h3 id="买卖股票的最佳时机-ii">买卖股票的最佳时机 II</h3>
+<p>给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。</p>
+<p>设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。</p>
+<p>注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）</p>
+<pre><code>输入: [7,1,5,3,6,4]
+输出: 7
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
+</code></pre>
+<pre><code class="language-js">/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    const l = prices.length
+    if(l &lt; 2) return 0;
+    let total = 0;
+    let v1 = 0;
+    let v2 = 1;
+    while(v1+1&lt;=l&amp;&amp;v2+1&lt;=l){
+      if(prices[v1] &gt;= prices[v2]){
+        v1++
+        v2++
+      }else{
+        while(prices[v2] &lt;= prices[v2+1] &amp;&amp; v2+1&lt;=l){
+          v2++
+        }
+        total += prices[v2] - prices[v1]
+        v2 += 2
+        v1 = v2 - 1
+      }
+    }
+    return total
+};
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[常用的Web-API的相关知识]]></title>
+        <id>http://localhost:4000/post/web-api</id>
+        <link href="http://localhost:4000/post/web-api">
+        </link>
+        <updated>2018-01-30T14:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>浏览器自带的api运用得当，可以事半功倍哦！</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>浏览器自带的api运用得当，可以事半功倍哦！</p>
+<!-- more -->
+<ul>
+<li>BOM</li>
+<li>DOM</li>
+<li>事件绑定</li>
+<li>ajax</li>
+<li>存储</li>
+</ul>
+<h3 id="常用的bom操作相关浏览器对象模型">常用的BOM操作相关（浏览器对象模型）</h3>
+<ul>
+<li>navigator 获取浏览器信息</li>
+</ul>
+<pre><code class="language-js">const ua = navigator.userAgent
+const isChrome = ua.indexOf('chrome')
+</code></pre>
+<ul>
+<li>screen 获取屏幕宽高</li>
+</ul>
+<pre><code class="language-js">screen.width
+screen.height
+</code></pre>
+<ul>
+<li>location 网络地址相关</li>
+</ul>
+<pre><code class="language-js">localtion.href //地址  www.baidu.com/api?a=1#hhh
+    .protocol //协议  https
+    .pathname //path /api
+    .search //参数 ?a=1
+    .hash //hash #hhh
+</code></pre>
+<ul>
+<li>history</li>
+</ul>
+<pre><code class="language-js">history.back()
+    .go()
+    .forward()
+</code></pre>
+<ul>
+<li>scroll</li>
+</ul>
+<pre><code class="language-js">scrollTo({}) //相对于页面的顶部滚动
+scrollBy({  //相对于浏览器的顶部滚动，适用于连续滚动
+    top: 100,
+    left: 100,
+    behavior: 'smooth'
+})
+</code></pre>
+<h3 id="常用的dom操作">常用的DOM操作</h3>
+<ul>
+<li>DOM 就是 JS 能识别的 HTML 结构，一个普通的 JS 对象或者数组。</li>
+</ul>
+<h4 id="property和attribute的区别">property和attribute的区别</h4>
+<ul>
+<li>property的获取和修改是直接改变dom对应的js对象</li>
+<li>attribute的获取和修改则是直接修改html上的属性，会触发dom的查询，重绘，重排，影响页面的性能</li>
+</ul>
+<pre><code class="language-js">const pdom = document.querySelectAll('p')
+const p = pdom[0]
+//property获取和修改
+p.style.width
+p.className = 'p1'
+//attribute获取和修改
+p.getAttribute('data-name')
+p.setAttribute('data-name','juejin')
+</code></pre>
+<h4 id="dom树常用的操作">dom树常用的操作</h4>
+<pre><code class="language-js">const div = document.getElementById('div1')
+// 新增节点
+const p1 = document.createElement('p')
+p1.innerHtml = 'this is p'
+div.appendChild(p1)
+// 获取父元素
+const parent = div.parentElement
+//获取子元素
+const child = div.childNodes
+//删除节点
+div.removeChild(child[0])
+</code></pre>
+<h3 id="事件绑定相关">事件绑定相关</h3>
+<h4 id="简单的事件绑定封装">简单的事件绑定封装</h4>
+<pre><code class="language-js"> function bindEvent(id,type,fn){
+    const a = document.getElementById(id)
+    if(a){
+        a.addEventListener(type,fn)
+    }
+ }
+ bindEvent('div','click',(e)=&gt;{
+    e.preventDefault()
+    console.log('hello')
+ })
+</code></pre>
+<h4 id="事件冒泡与事件代理">事件冒泡与事件代理</h4>
+<ul>
+<li>事件冒泡即当父子元素都绑定相同类型的事件，触发子元素时，会从下到上依次寻找是否有被相同绑定的元素，依次触发，直到结束。</li>
+</ul>
+<pre><code class="language-js">var body = document.body
+bindEvent(body, 'click', function (e) {
+    // 所有 p 的点击都会冒泡到 body 上，因为 DOM 结构中 body 是 p 的上级节点，事件会沿着 DOM 树向上冒泡
+    alert('取消')
+})
+
+var p1 = document.getElementById('p1')
+bindEvent(p1, 'click', function (e) {
+    e.stopPropagation() // 阻止冒泡
+    alert('激活')
+})
+</code></pre>
+<ul>
+<li>事件代理也叫事件委托，当需要同时监听同级的相同元素时，可以将事件绑定其父元素上</li>
+</ul>
+<pre><code class="language-js">var div1 = document.getElementById('div1')
+div1.addEventListener('click', function (e) {
+  // e.target 可以监听到触发点击事件的元素是哪一个
+  var target = e.target
+  if (target.nodeName === 'A') {
+      // 点击的是 &lt;a&gt; 元素
+      alert(target.innerHTML)
+  }
+})
+</code></pre>
+<ul>
+<li>当元素同时有事件绑定和事件委托的时候，先触发绑定的元素，再触发委托的事件,因为dom2级，默认的是事件冒泡的结构，需要改成捕获的话需要在addEventElement的第三个参数改成true</li>
+</ul>
+<pre><code class="language-js">//优化刚开始的绑定函数
+function bindEvent(elem, type, selector, fn) {
+    // 这样处理，可接收两种调用方式 bindEvent(div1, 'click', 'a', function () {...}) 和 bindEvent(div1, 'click', function () {...}) 这两种
+    if (fn == null) {
+        fn = selector
+        selector = null
+    }
+    // 绑定事件
+    elem.addEventListener(type, function (e) {
+        var target
+        if (selector) {
+            // 有 selector 说明需要做事件代理
+            // 获取触发时间的元素，即 e.target
+            target = e.target
+            // 看是否符合 selector 这个条件
+            if (target.matches(selector)) {
+                fn.call(target, e)
+            }
+        } else {
+            // 无 selector ，说明不需要事件代理
+            fn(e)
+        }
+    })
+}
+</code></pre>
+<h3 id="ajax">Ajax</h3>
+<ul>
+<li>XMLHttpRequest</li>
+</ul>
+<pre><code class="language-js">//纯ajax
+var xhr = new XMLHttpRequest()
+xhr.onreadystatechange = function(){
+    if(xhr.readystate === 4){
+        if(xhr.status === 200){
+         ....
+        }
+    }
+}
+xhr.open('GET','/api',false) //readystate等于1调用
+xhr.send(null) //等于2调用
+</code></pre>
+<ul>
+<li>fetch</li>
+</ul>
+<pre><code class="language-js">fetch('some/api/data.json', {
+  method:'POST', //请求类型 GET、POST
+  headers:{}, // 请求的头信息，形式为 Headers 对象或 ByteString
+  body:{}, //请求发送的数据 blob、BufferSource、FormData、URLSearchParams（get 或head 方法中不能包含 body）
+  mode:'', //请求的模式，是否跨域等，如 cors、 no-cors 或 same-origin
+  credentials:'', //cookie 的跨域策略，如 omit、same-origin 或 include
+  cache:'', //请求的 cache 模式: default、no-store、reload、no-cache、 force-cache 或 only-if-cached
+}).then(function(response) { ... });
+</code></pre>
+<h4 id="跨域问题">跨域问题</h4>
+<ul>
+<li>当协议，域名，端口其中之一不同时，即为跨域</li>
+<li>但是script,img,link标签的src可以跨域</li>
+<li>JSONP解决跨域，即本地创建好一个函数，然后引入跨域服务器的js脚本，js脚本中执行函数，从而将数据传回本地当中去</li>
+</ul>
+<pre><code class="language-js">&lt;script type=&quot;text/javascript&quot;&gt; 
+    // 得到航班信息查询结果后的回调函数 
+    var flightHandler = function(data){
+        alert('你查询的航班结果是：票价 ' + data.price + ' 元，' + '余票 ' + data.tickets + ' 张。');
+    }; 
+    // 提供jsonp服务的url地址（不管是什么类型的地址，最终生成的返回值都是一段javascript代码） 
+    var url = &quot;跨域服务器/flightResult.php?code=CA1998&amp;callback=flightHandler&quot;;
+    // 创建script标签，设置其属性 
+    var script = document.createElement('script'); 
+    script.setAttribute('src', url); 
+    // 把script标签加入head，此时调用开始 
+    document.getElementsByTagName('head')[0].appendChild(script); 
+&lt;/script&gt;
+</code></pre>
+<ul>
+<li>服务器端设置 http header解决跨域</li>
+</ul>
+<pre><code class="language-js">response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);  // 第二个参数填写允许跨域的域名称，不建议直接写 &quot;*&quot;
+response.setHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;X-Requested-With&quot;);
+response.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;PUT,POST,GET,DELETE,OPTIONS&quot;);
+
+// 接收跨域的cookie
+response.setHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;);
+</code></pre>
+<h3 id="存储相关">存储相关</h3>
+<h4 id="cookie">cookie</h4>
+<ul>
+<li>存储小，只有4kb</li>
+<li>所有http请求都会带着，影响效率</li>
+<li>api简单，需要封装</li>
+</ul>
+<h4 id="localstorage和sessionstorage">localStorage和sessionStorage</h4>
+<ul>
+<li>存储大，有5mb</li>
+<li>不会带到http中</li>
+<li>api简单，localStorage.setItem(key,value),getItem(key)</li>
+<li>sessionStorage是当浏览器退出即删除，localStorage则是一直存在</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[常见的HTML-CSS中会遇到的问题]]></title>
+        <id>http://localhost:4000/post/html-css</id>
+        <link href="http://localhost:4000/post/html-css">
+        </link>
+        <updated>2018-01-11T14:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>HTML和CSS是基本组成部分，虽然现在三大框架的原因，几乎很少去原生的去编写了，但是了解其根本是不可避免的</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>HTML和CSS是基本组成部分，虽然现在三大框架的原因，几乎很少去原生的去编写了，但是了解其根本是不可避免的</p>
+<!-- more -->
+<h4 id="盒大小计算">盒大小计算</h4>
+<ul>
+<li>传统盒模型由内到外分别为content-&gt;padding-&gt;border-&gt;margin，容易导致盒子的宽度的变化</li>
+<li>box-sizing:border-box,设置这个属性使得模型改为了content = content+padding+border之和，方便计算和修改</li>
+</ul>
+<h4 id="margin的重叠问题">margin的重叠问题</h4>
+<p>当上下两个block元素都存在marigin时，大的会覆盖小的，而不是叠加。当一个为负值时会先转为绝对值再相减，当两个为负值时，转为正值，然后用0去减最大值</p>
+<pre><code class="language-html">解决方案：底部元素使用浮动或者绝对定位，或者统一margin的边距
+</code></pre>
+<p>当父元素没有border,padding,inline时，子元素的margin-top/bottom也会与父元素发生重叠</p>
+<pre><code>解决方案：父元素添加padding,overflow:hidden,border,或者子元素添加绝对定位和浮动
+</code></pre>
+<h3 id="floatpositionflex">float,position,flex</h3>
+<h4 id="float问题相关">float问题相关</h4>
+<p>浮动脱离文档流，最先是为了实现文字环绕图片的效果，而后被人烂用来布局，常见圣杯布局和双飞翼布局</p>
+<p>清除浮动，需要给所有浮动元素的父容器添加clearfix这个类</p>
+<pre><code class="language-css">.clearfix:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+.clearfix{
+    *zoom: 1;
+}
+</code></pre>
+<p>双飞翼布局使用margin来腾出空间，双飞翼布局中间部分需要再包一层布局，不然无法使用margin.</p>
+<p>圣杯布局使用padding来腾出空间,圣杯布局需要一个最小宽度，因为由于设置了相对定位，所以当left原来的位置和right的位置产生重叠时，由于浮动的原因一行放不下就会换行</p>
+<pre><code class="language-css">body{
+ min-width: 600px; 
+}
+.main{
+ float: left;
+ width: 100%;
+ height:200px;
+}
+/* 双飞翼布局相关 */
+.main-content{
+ margin: 0 200px;
+}
+.left{
+ float: left;
+ width: 200px;
+ height: 200px;
+ /* 圣杯布局相关 */
+ margin-left: -100%;
+ position: relative;
+ left: -200px;
+ /* 双飞翼布局相关 */
+ margin-left: -100%;
+}
+.right{
+/* 圣杯布局相关*/
+ margin-left: -200px;
+ position: relative;
+ left: 200px;
+ /* 双飞翼布局相关 */
+ margin-left: -200px;
+}
+</code></pre>
+<h4 id="position问题相关">position问题相关</h4>
+<ul>
+<li>relative 相对定位，相对于最近一个非static定位的元素</li>
+<li>position 绝对定位，绝对于最近一个非static定位的元素</li>
+<li>fixed 绝对定位，相对于window</li>
+</ul>
+<h4 id="flex布局">flex布局</h4>
+<p>flex布局是目前来说最常用的布局了，因为简单使用易上手</p>
+<ul>
+<li>给一个元素设置display:flex时，他的子元素便成为了flex布局</li>
+<li>父元素可以设置主轴方向flex-direction，row为水平方向排列，column为垂直方向排列，xx-reverse则为反转</li>
+<li>然后可以设置主轴的对齐方式justify-content, 属性有flex-start/end,center,space-between,apace-around，顾名思义</li>
+<li>align-items则为另一个非主轴的对齐方式，属性有flex-statr/end,center,stretch(拉伸于容器同高/宽),baseline(依据子元素的文字对齐)</li>
+</ul>
+<h3 id="css选择器的权重和优先级">css选择器的权重和优先级</h3>
+<ul>
+<li>内联样式的权值为1000，如style='xxx'</li>
+<li>id选择器的权值为100, 如#content</li>
+<li>类，伪类和属性选择器的权值为10，如.content,:hover,[attribute]</li>
+<li>元素选择器和伪类选择器的权值为1，如 div,p</li>
+<li>相同权重的后面覆盖前面</li>
+</ul>
+<h3 id="重绘和回流">重绘和回流</h3>
+<ul>
+<li>重绘：当修改简单样式的时候，如颜色，背景，导致浏览器重新绘制样式</li>
+<li>回流：当dom元素大小和位置和属性发生改变，导致浏览器重新渲染文档</li>
+<li>回流损耗比重绘高，应该避免重复操作dom,应该一次性获取起索引，计算完全后再进行操作</li>
+</ul>
+]]></content>
+    </entry>
+</feed>

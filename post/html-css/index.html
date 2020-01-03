@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>常见的HTML-CSS中会遇到的问题 | XuYu&#39;Blog</title>
+<meta name="description" content="&lt;p&gt;物有本末，事有始终&lt;/p&gt;
+&lt;p&gt;知所先后，则近道矣&lt;/p&gt;">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico?v=1578020264350">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="http://localhost:4000/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="http://localhost:4000">XuYu&#39;Blog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="http://localhost:4000/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="http://localhost:4000/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>常见的HTML-CSS中会遇到的问题</h1>
+            <p class="article-meta">
+              2018-01-11
+              
+                <a href="http://localhost:4000/tag/INGqa940L" class="badge ">
+                  Web
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>HTML和CSS是基本组成部分，虽然现在三大框架的原因，几乎很少去原生的去编写了，但是了解其根本是不可避免的</p>
+<!-- more -->
+<h4 id="盒大小计算">盒大小计算</h4>
+<ul>
+<li>传统盒模型由内到外分别为content-&gt;padding-&gt;border-&gt;margin，容易导致盒子的宽度的变化</li>
+<li>box-sizing:border-box,设置这个属性使得模型改为了content = content+padding+border之和，方便计算和修改</li>
+</ul>
+<h4 id="margin的重叠问题">margin的重叠问题</h4>
+<p>当上下两个block元素都存在marigin时，大的会覆盖小的，而不是叠加。当一个为负值时会先转为绝对值再相减，当两个为负值时，转为正值，然后用0去减最大值</p>
+<pre><code class="language-html">解决方案：底部元素使用浮动或者绝对定位，或者统一margin的边距
+</code></pre>
+<p>当父元素没有border,padding,inline时，子元素的margin-top/bottom也会与父元素发生重叠</p>
+<pre><code>解决方案：父元素添加padding,overflow:hidden,border,或者子元素添加绝对定位和浮动
+</code></pre>
+<h3 id="floatpositionflex">float,position,flex</h3>
+<h4 id="float问题相关">float问题相关</h4>
+<p>浮动脱离文档流，最先是为了实现文字环绕图片的效果，而后被人烂用来布局，常见圣杯布局和双飞翼布局</p>
+<p>清除浮动，需要给所有浮动元素的父容器添加clearfix这个类</p>
+<pre><code class="language-css">.clearfix:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+.clearfix{
+    *zoom: 1;
+}
+</code></pre>
+<p>双飞翼布局使用margin来腾出空间，双飞翼布局中间部分需要再包一层布局，不然无法使用margin.</p>
+<p>圣杯布局使用padding来腾出空间,圣杯布局需要一个最小宽度，因为由于设置了相对定位，所以当left原来的位置和right的位置产生重叠时，由于浮动的原因一行放不下就会换行</p>
+<pre><code class="language-css">body{
+ min-width: 600px; 
+}
+.main{
+ float: left;
+ width: 100%;
+ height:200px;
+}
+/* 双飞翼布局相关 */
+.main-content{
+ margin: 0 200px;
+}
+.left{
+ float: left;
+ width: 200px;
+ height: 200px;
+ /* 圣杯布局相关 */
+ margin-left: -100%;
+ position: relative;
+ left: -200px;
+ /* 双飞翼布局相关 */
+ margin-left: -100%;
+}
+.right{
+/* 圣杯布局相关*/
+ margin-left: -200px;
+ position: relative;
+ left: 200px;
+ /* 双飞翼布局相关 */
+ margin-left: -200px;
+}
+</code></pre>
+<h4 id="position问题相关">position问题相关</h4>
+<ul>
+<li>relative 相对定位，相对于最近一个非static定位的元素</li>
+<li>position 绝对定位，绝对于最近一个非static定位的元素</li>
+<li>fixed 绝对定位，相对于window</li>
+</ul>
+<h4 id="flex布局">flex布局</h4>
+<p>flex布局是目前来说最常用的布局了，因为简单使用易上手</p>
+<ul>
+<li>给一个元素设置display:flex时，他的子元素便成为了flex布局</li>
+<li>父元素可以设置主轴方向flex-direction，row为水平方向排列，column为垂直方向排列，xx-reverse则为反转</li>
+<li>然后可以设置主轴的对齐方式justify-content, 属性有flex-start/end,center,space-between,apace-around，顾名思义</li>
+<li>align-items则为另一个非主轴的对齐方式，属性有flex-statr/end,center,stretch(拉伸于容器同高/宽),baseline(依据子元素的文字对齐)</li>
+</ul>
+<h3 id="css选择器的权重和优先级">css选择器的权重和优先级</h3>
+<ul>
+<li>内联样式的权值为1000，如style='xxx'</li>
+<li>id选择器的权值为100, 如#content</li>
+<li>类，伪类和属性选择器的权值为10，如.content,:hover,[attribute]</li>
+<li>元素选择器和伪类选择器的权值为1，如 div,p</li>
+<li>相同权重的后面覆盖前面</li>
+</ul>
+<h3 id="重绘和回流">重绘和回流</h3>
+<ul>
+<li>重绘：当修改简单样式的时候，如颜色，背景，导致浏览器重新绘制样式</li>
+<li>回流：当dom元素大小和位置和属性发生改变，导致浏览器重新渲染文档</li>
+<li>回流损耗比重绘高，应该避免重复操作dom,应该一次性获取起索引，计算完全后再进行操作</li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="http://localhost:4000/images/avatar.png?v=1578020264350" class="no-responsive avatar">
+    <div class="text-muted"><p>物有本末，事有始终</p>
+<p>知所先后，则近道矣</p></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/xss">必知必会--浏览器安全知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/useful-fn">JavaScript中常用的方法的相关实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/http-1">前端性能优化原理与实践</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-math">leetcode初级算法-数学篇和排序搜索篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-string">leetcode初级算法-字符串篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/leetcode-array">leetcode初级算法-数组篇JavaScript实现</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/web-api">常用的Web-API的相关知识</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/html-css">常见的HTML-CSS中会遇到的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="http://localhost:4000/post/about">关于我</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="http://localhost:4000/tag/INGqa940L" class="badge warning">
+          Web
+        </a>
+      
+        <a href="http://localhost:4000/tag/24QRazQ1RD" class="badge ">
+          JavaScript
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/xypisces" target="_blank">xuyu</a> | <a class="rss" href="http://localhost:4000/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
