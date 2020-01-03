@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://localhost:4000</id>
+    <id>https://xypisces.github.io/</id>
     <title>XuYu&apos;Blog</title>
-    <updated>2020-01-03T02:57:45.874Z</updated>
+    <updated>2020-01-03T03:04:40.066Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="http://localhost:4000"/>
-    <link rel="self" href="http://localhost:4000/atom.xml"/>
+    <link rel="alternate" href="https://xypisces.github.io/"/>
+    <link rel="self" href="https://xypisces.github.io/atom.xml"/>
     <subtitle>&lt;p&gt;物有本末，事有始终&lt;/p&gt;
 &lt;p&gt;知所先后，则近道矣&lt;/p&gt;</subtitle>
-    <logo>http://localhost:4000/images/avatar.png</logo>
-    <icon>http://localhost:4000/favicon.ico</icon>
+    <logo>https://xypisces.github.io/images/avatar.png</logo>
+    <icon>https://xypisces.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, XuYu&apos;Blog</rights>
     <entry>
         <title type="html"><![CDATA[必知必会--浏览器安全知识]]></title>
-        <id>http://localhost:4000/post/xss</id>
-        <link href="http://localhost:4000/post/xss">
+        <id>https://xypisces.github.io/post/xss</id>
+        <link href="https://xypisces.github.io/post/xss">
         </link>
         <updated>2018-07-14T13:30:00.000Z</updated>
         <summary type="html"><![CDATA[<p>前端涉及到的安全问题主要有二大块，xss攻击和csrf攻击，虽然前端发展至今已经有很多抵御这两种攻击的方式了，但也不是不能不了解的知识点</p>
@@ -60,8 +60,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript中常用的方法的相关实现]]></title>
-        <id>http://localhost:4000/post/useful-fn</id>
-        <link href="http://localhost:4000/post/useful-fn">
+        <id>https://xypisces.github.io/post/useful-fn</id>
+        <link href="https://xypisces.github.io/post/useful-fn">
         </link>
         <updated>2018-05-16T11:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>本文涉及日常开发常用的方法的相关实现，在面试中也是经常能够被问到的</p>
@@ -284,8 +284,8 @@ function deepClone2(obj, hash = new WeakMap()) {
     </entry>
     <entry>
         <title type="html"><![CDATA[前端性能优化原理与实践]]></title>
-        <id>http://localhost:4000/post/http-1</id>
-        <link href="http://localhost:4000/post/http-1">
+        <id>https://xypisces.github.io/post/http-1</id>
+        <link href="https://xypisces.github.io/post/http-1">
         </link>
         <updated>2018-04-16T12:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>url从输入到页面到底发生了什么，这几乎是面试必考题，当你回答出来了，然后面试官问你怎么针对性优化，你还能答得上来么？</p>
@@ -406,8 +406,8 @@ function deepClone2(obj, hash = new WeakMap()) {
     </entry>
     <entry>
         <title type="html"><![CDATA[leetcode初级算法-数学篇和排序搜索篇JavaScript实现]]></title>
-        <id>http://localhost:4000/post/leetcode-math</id>
-        <link href="http://localhost:4000/post/leetcode-math">
+        <id>https://xypisces.github.io/post/leetcode-math</id>
+        <link href="https://xypisces.github.io/post/leetcode-math">
         </link>
         <updated>2018-02-21T14:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>考察基本的数学思维和基本的排序算法</p>
@@ -698,8 +698,8 @@ var romanToInt = function(s) {
     </entry>
     <entry>
         <title type="html"><![CDATA[leetcode初级算法-字符串篇JavaScript实现]]></title>
-        <id>http://localhost:4000/post/leetcode-string</id>
-        <link href="http://localhost:4000/post/leetcode-string">
+        <id>https://xypisces.github.io/post/leetcode-string</id>
+        <link href="https://xypisces.github.io/post/leetcode-string">
         </link>
         <updated>2018-02-14T13:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>字符串说到底还是数组的思想，主要掌握自带的api，学会灵活运用</p>
@@ -1021,8 +1021,8 @@ var countAndSay = function(n) {
     </entry>
     <entry>
         <title type="html"><![CDATA[leetcode初级算法-数组篇JavaScript实现]]></title>
-        <id>http://localhost:4000/post/leetcode-array</id>
-        <link href="http://localhost:4000/post/leetcode-array">
+        <id>https://xypisces.github.io/post/leetcode-array</id>
+        <link href="https://xypisces.github.io/post/leetcode-array">
         </link>
         <updated>2018-02-12T13:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>本文是关于leetcode初级算法中关于数组方面的问题并通过JavaScript实现</p>
@@ -1335,8 +1335,8 @@ var maxProfit = function(prices) {
     </entry>
     <entry>
         <title type="html"><![CDATA[常用的Web-API的相关知识]]></title>
-        <id>http://localhost:4000/post/web-api</id>
-        <link href="http://localhost:4000/post/web-api">
+        <id>https://xypisces.github.io/post/web-api</id>
+        <link href="https://xypisces.github.io/post/web-api">
         </link>
         <updated>2018-01-30T14:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>浏览器自带的api运用得当，可以事半功倍哦！</p>
@@ -1566,8 +1566,8 @@ response.setHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot
     </entry>
     <entry>
         <title type="html"><![CDATA[常见的HTML-CSS中会遇到的问题]]></title>
-        <id>http://localhost:4000/post/html-css</id>
-        <link href="http://localhost:4000/post/html-css">
+        <id>https://xypisces.github.io/post/html-css</id>
+        <link href="https://xypisces.github.io/post/html-css">
         </link>
         <updated>2018-01-11T14:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>HTML和CSS是基本组成部分，虽然现在三大框架的原因，几乎很少去原生的去编写了，但是了解其根本是不可避免的</p>
