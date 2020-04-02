@@ -2,12 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xypisces.github.io/</id>
     <title>XuYu&apos;Blog</title>
-    <updated>2020-04-02T08:05:18.039Z</updated>
+    <updated>2020-04-02T08:39:27.348Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xypisces.github.io/"/>
     <link rel="self" href="https://xypisces.github.io/atom.xml"/>
-    <subtitle>物有本末，事有始终
-知所先后，则近道矣</subtitle>
+    <subtitle>物有本末，事有始终，知所先后，则近道矣。</subtitle>
     <logo>https://xypisces.github.io/images/avatar.png</logo>
     <icon>https://xypisces.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, XuYu&apos;Blog</rights>
